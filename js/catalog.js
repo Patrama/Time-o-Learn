@@ -33,22 +33,22 @@
     if (!Array.isArray(raw) || raw.length === 0) return null;
     return raw
       .filter(function (g) {
-        return g && g.id && g.path;
+        return g && g.id;
       })
       .map(function (g) {
         return {
           id: g.id,
-          name: g.name || g.nameId || g.id,
-          nameId: g.nameId || g.name || g.id,
-          description: g.description || "",
-          descriptionId: g.descriptionId || g.description || "",
+          name: g.name || g.title_en || g.nameId || g.id,
+          nameId: g.nameId || g.title_id || g.name || g.id,
+          description: g.description || g.description_en || "",
+          descriptionId: g.descriptionId || g.description_id || g.description || "",
           category: g.category || "other",
           ageMin: Number(g.ageMin) || 0,
           ageMax: Number(g.ageMax) || 99,
           badge: g.badge || "free",
-          path: g.path,
+          path: g.path || "page/game-content/" + g.id + ".html",
           emoji: g.emoji || "🎮",
-          thumb: g.thumb || "",
+          thumb: g.thumb || g.thumbnail || "",
           featured: !!g.featured,
         };
       });
