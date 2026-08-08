@@ -9,7 +9,7 @@
  */
 window.APP_CONFIG = {
   /** Deployed Vercel API base (Repo B). Placeholder until Repo B deploys. */
-  apiBaseUrl: "https://api.time-o-learn.example.com",
+  apiBaseUrl: "https://ivy-tol.vercel.app/",
 
   /** Languages shipped at launch (plan §1). First entry = default fallback. */
   supportedLanguages: ["en", "id"],
