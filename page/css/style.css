@@ -30,19 +30,26 @@ body {
    ============================================================ */
 
 body.storefront {
-  --bg: #faf9f5;
-  --surface: #ffffff;
-  --surface-alt: #f1efe7;
-  --border: #e6e2d6;
-  --text-primary: #322f29;
-  --text-secondary: #8c8677;
-  --accent: #7fb2a4;
-  --accent-soft: rgba(127, 178, 164, 0.16);
-  --accent-contrast: #24463d;
-  --badge-text: #4e8a79;
-  --danger: #c4795f;
-  --danger-soft: rgba(196, 121, 95, 0.12);
-  --radius: 12px;
+  --bg: linear-gradient(135deg, #f4f8fb 0%, #eef3f7 45%, #f6f1e7 100%);
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-strong: #ffffff;
+  --surface-alt: #f3f7fb;
+  --surface-muted: #e8eef4;
+  --border: #d8e2ec;
+  --text-primary: #17324a;
+  --text-secondary: #5f7486;
+  --accent: #2f6f8f;
+  --accent-strong: #1b4c63;
+  --accent-soft: rgba(47, 111, 143, 0.12);
+  --accent-contrast: #f5fbff;
+  --badge-text: #29607a;
+  --danger: #b04c56;
+  --danger-soft: rgba(176, 76, 86, 0.12);
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 10px 24px rgba(23, 50, 74, 0.08);
+  --shadow-md: 0 20px 45px rgba(23, 50, 74, 0.12);
+  --shadow-lg: 0 28px 65px rgba(23, 50, 74, 0.16);
 
   margin: 0 auto;
   max-width: 1280px;
@@ -50,29 +57,37 @@ body.storefront {
   background: var(--bg);
   color: var(--text-primary);
   font-family:
+    "Inter",
+    "Segoe UI",
     system-ui,
     -apple-system,
-    "Segoe UI",
     Roboto,
     sans-serif;
+  letter-spacing: -0.01em;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
 }
 
 html.dark body.storefront {
-  --bg: #14181b;
-  --surface: #1b2124;
-  --surface-alt: #232a2e;
-  --border: #2c343a;
-  --text-primary: #e9e6dd;
-  --text-secondary: #8d9499;
-  --accent: #6fb6a2;
-  --accent-soft: rgba(111, 182, 162, 0.16);
-  --accent-contrast: #0e1614;
-  --badge-text: #93d2bd;
-  --danger: #e0917c;
-  --danger-soft: rgba(224, 145, 124, 0.12);
+  --bg: linear-gradient(135deg, #11171c 0%, #162029 50%, #1a2228 100%);
+  --surface: rgba(24, 31, 38, 0.88);
+  --surface-strong: #1d2630;
+  --surface-alt: #232c36;
+  --surface-muted: #2a3742;
+  --border: #324251;
+  --text-primary: #edf4f8;
+  --text-secondary: #8da0ad;
+  --accent: #6db0ca;
+  --accent-strong: #dceff8;
+  --accent-soft: rgba(109, 176, 202, 0.16);
+  --accent-contrast: #082230;
+  --badge-text: #a9d5e6;
+  --danger: #e28d94;
+  --danger-soft: rgba(226, 141, 148, 0.12);
+  --shadow-sm: 0 10px 26px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 20px 44px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 28px 64px rgba(0, 0, 0, 0.42);
 }
 
 body.storefront .hidden {
@@ -86,16 +101,23 @@ body.storefront .hidden {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem clamp(1rem, 4vw, 2rem);
+  margin: 0.75rem 0 0.25rem;
 }
 
 .app-header h1 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* Back button (returns to main index) */
+.back-btn,
+.theme-toggle {
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+}
+
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -104,42 +126,46 @@ body.storefront .hidden {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-secondary);
-  background: var(--surface-alt);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.42rem 0.85rem;
+  padding: 0.42rem 0.9rem;
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
-    background-color 0.2s ease;
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .back-btn:hover {
   color: var(--text-primary);
   border-color: var(--accent);
   background: var(--accent-soft);
+  transform: translateY(-1px);
 }
 
 .theme-toggle {
   flex: none;
-  width: 2rem;
-  height: 2rem;
+  width: 2.1rem;
+  height: 2.1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: var(--surface-alt);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   cursor: pointer;
   transition:
     color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .theme-toggle:hover {
   color: var(--accent);
   border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .icon {
@@ -148,71 +174,84 @@ body.storefront .hidden {
 }
 
 .app-main {
-  width: min(880px, 100%);
+  width: min(900px, 100%);
   margin: 0 auto;
   padding: 0 clamp(1rem, 4vw, 2rem) 2rem;
 }
 
 .search-input {
   width: 100%;
-  margin-bottom: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 12px;
+  margin-bottom: 0.9rem;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--surface-strong);
   color: var(--text-primary);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
 }
 
 .search-input::placeholder {
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow:
+    0 0 0 3px var(--accent-soft),
+    var(--shadow-sm);
 }
 
 /* ---- Category tabs ---- */
 .cat-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
 }
 
 .cat-btn {
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.35rem 1rem;
-  font-size: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  background: var(--surface-alt);
+  background: var(--surface);
   color: var(--text-secondary);
   cursor: pointer;
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    transform 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .cat-btn:hover {
   color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 .cat-btn.active {
-  background: var(--accent);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-strong) 100%
+  );
   color: var(--accent-contrast);
   border-color: var(--accent);
 }
 
 /* ---- Table ---- */
 .table-wrap {
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-md);
 }
 
 .table-header {
@@ -220,8 +259,12 @@ body.storefront .hidden {
   grid-template-columns: 34px 1fr 1fr 60px;
   gap: 0.5rem;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  background: var(--accent-soft);
+  padding: 0.7rem 0.9rem;
+  background: linear-gradient(
+    135deg,
+    var(--surface-alt) 0%,
+    var(--accent-soft) 100%
+  );
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -239,7 +282,7 @@ body.storefront .hidden {
 
 .state-msg {
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   padding: 2rem 1rem;
 }
@@ -254,12 +297,16 @@ body.storefront .hidden {
   grid-template-columns: 34px 1fr 1fr 60px;
   gap: 0.5rem;
   align-items: center;
-  padding: 0.6rem 0.75rem;
+  padding: 0.7rem 0.9rem;
   border-top: 1px solid var(--border);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .row:hover {
   background: var(--surface-alt);
+  transform: translateY(-1px);
 }
 
 .row .num {
@@ -279,17 +326,17 @@ body.storefront .hidden {
   background: var(--accent-soft);
   color: var(--badge-text);
   font-size: 0.56rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 0.12rem 0.5rem;
+  padding: 0.14rem 0.55rem;
   border-radius: 999px;
 }
 
 .row .name {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.38;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -299,23 +346,33 @@ body.storefront .hidden {
 .row .view {
   justify-self: center;
   text-align: center;
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   font-weight: 700;
   text-decoration: none;
-  padding: 0.38rem 0;
+  padding: 0.42rem 0;
   width: 100%;
-  border-radius: 8px;
-  background: var(--accent-soft);
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    var(--accent-soft) 0%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
   color: var(--badge-text);
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border: 1px solid var(--border);
   transition:
     background-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .row .view:hover {
-  background: var(--accent);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-strong) 100%
+  );
   color: var(--accent-contrast);
+  transform: translateY(-1px);
 }
 
 /* ---- Storefront desktop refinements ---- */
@@ -325,8 +382,8 @@ body.storefront .hidden {
   }
 
   .search-input {
-    font-size: 0.85rem;
-    padding: 0.65rem 1rem;
+    font-size: 0.86rem;
+    padding: 0.8rem 1rem;
   }
 
   .cat-btn {
@@ -336,14 +393,14 @@ body.storefront .hidden {
   .table-header {
     grid-template-columns: 44px 1.2fr 2fr 1fr;
     gap: 0.75rem;
-    padding: 0.7rem 1rem;
+    padding: 0.75rem 1rem;
     font-size: 0.7rem;
   }
 
   .row {
     grid-template-columns: 44px 1.2fr 2fr 1fr;
     gap: 0.75rem;
-    padding: 0.7rem 1rem;
+    padding: 0.75rem 1rem;
   }
 
   .row .num {
@@ -370,7 +427,11 @@ body.storefront .hidden {
   }
 
   .row .view:hover {
-    background: var(--accent);
+    background: linear-gradient(
+      135deg,
+      var(--accent) 0%,
+      var(--accent-strong) 100%
+    );
     color: var(--accent-contrast);
   }
 }
