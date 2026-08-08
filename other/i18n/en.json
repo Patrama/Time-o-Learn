@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "siteName": "Time-o-Learn",
+    "tagline": "Fun learning games for little ones"
+  },
+  "nav": {
+    "skip": "Skip to games",
+    "back": "Back",
+    "close": "Close"
+  },
+  "hero": {
+    "kicker": "Play & learn, anywhere",
+    "title": "Time-o-Learn",
+    "subtitle": "Fun, safe learning games for toddlers and elementary kids — play on any phone, even slow ones."
+  },
+  "menu": {
+    "heading": "Games",
+    "loading": "Loading games…",
+    "error": "Couldn't load the game list. Check your connection and try again.",
+    "retry": "Try again",
+    "offlineNote": "You're offline — showing the last saved game list.",
+    "years": "yrs",
+    "noResults": "No games match your filters.",
+    "category": "Category",
+    "badge": {
+      "free": "Free",
+      "trial": "Trial",
+      "rental": "Rental",
+      "subscription": "Subscription"
+    },
+    "filter": {
+      "all": "All",
+      "free": "Free",
+      "trial": "Trial",
+      "rental": "Rental",
+      "subscription": "Subscription"
+    },
+    "cat": {
+      "classic": "Classic",
+      "puzzle": "Puzzle",
+      "letters": "Letters",
+      "numbers": "Numbers",
+      "memory": "Memory",
+      "other": "Other"
+    },
+    "visitHint": "Tap a game to play"
+  },
+  "game": {
+    "play": "Play now",
+    "restart": "Play again",
+    "loadError": "Couldn't load the game.",
+    "backToMenu": "Back to menu",
+    "score": "Score",
+    "best": "Best",
+    "over": "Game over",
+    "pause": "Pause",
+    "resume": "Resume"
+  },
+  "lang": {
+    "label": "Language"
+  },
+  "footer": {
+    "rights": "Made with care for little learners."
+  }
+}

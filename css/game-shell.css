@@ -1,0 +1,218 @@
+/* ============================================================
+   Time-o-Learn — Game shell (shared across game pages)
+   Plan §4.2 "Game view": phone-first. Canvas fills viewport
+   width; controls docked at bottom within thumb reach; close/back
+   top-left as a large tappable icon. Tablet/desktop: fixed
+   max-width and centered, never stretched edge-to-edge.
+   Uses tokens from css/tokens.css.
+   ============================================================ */
+
+/* ---------- Base (phone) ---------- */
+.game-page {
+  --font-scale-1: 0.75rem;
+  --font-scale-2: 1rem;
+  --font-scale-3: 1.25rem;
+  --font-scale-4: 1.5rem;
+  --font-scale-5: 2rem;
+
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  padding-top: calc(0.75rem + env(safe-area-inset-top));
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.game-title {
+  font: 600 var(--font-scale-2) / 1.2 var(--font-sans);
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px; /* WCAG 2.5.5 touch target */
+  padding: 0 0.75rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: var(--font-scale-3);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.icon-btn:active {
+  background: var(--ink-010);
+}
+
+.game-stage-wrap {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0.5rem;
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+}
+
+.game-stage {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  touch-action: none;
+}
+
+/* ---------- Game HUD (score, pause) ---------- */
+.game-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.hud-item {
+  font: 600 var(--font-scale-2) / 1.2 var(--font-sans);
+  color: var(--text-muted);
+}
+
+/* ---------- Touch controls (docked bottom) ---------- */
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.25rem;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  touch-action: manipulation;
+}
+
+.dpad-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: var(--font-scale-4);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.dpad-btn:active {
+  background: var(--ink-010);
+}
+
+.dpad-btn[data-dir="up"] { grid-area: 1 / 2; }
+.dpad-btn[data-dir="left"] { grid-area: 2 / 1; }
+.dpad-btn[data-dir="down"] { grid-area: 3 / 2; }
+.dpad-btn[data-dir="right"] { grid-area: 2 / 3; }
+
+/* ---------- Game over / pause overlay ---------- */
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: var(--radius-lg);
+  color: #fff;
+  text-align: center;
+  z-index: 5;
+}
+
+.game-overlay.visible {
+  display: flex;
+}
+
+.overlay-title {
+  font: 700 var(--font-scale-5) / 1.2 var(--font-sans);
+}
+
+.overlay-score {
+  font: 600 var(--font-scale-3) / 1.3 var(--font-sans);
+  opacity: 0.92;
+}
+
+.overlay-btn {
+  min-width: 44px;
+  min-height: 48px;
+  padding: 0 1.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--brand-strong);
+  color: #fff;
+  font: 600 var(--font-scale-2) / 1 var(--font-sans);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.overlay-btn:active {
+  filter: brightness(0.94);
+}
+
+/* ---------- Tablet (≥600px) ---------- */
+@media (min-width: 600px) {
+  .game-stage-wrap {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .game-stage {
+    max-width: 640px; /* fixed max, centered — never stretched */
+  }
+
+  .game-canvas {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .dpad {
+    max-width: 320px;
+  }
+}
+
+/* ---------- Desktop (≥900px) ---------- */
+@media (min-width: 900px) {
+  .game-stage-wrap {
+    padding: 1.5rem 2rem;
+  }
+
+  .game-stage {
+    max-width: 720px;
+  }
+}

@@ -1,0 +1,290 @@
+/**
+ * Time-o-Learn — Design tokens.
+ * Mobile-first: base styles ARE the phone. Tablet/desktop only ADD layout
+ * via min-width media queries (never max-width overrides). See plan §4.1.
+ */
+
+/* ---------- Brand tokens (light — default) ---------- */
+:root {
+  --brand-090: #0c2434;
+  --brand-080: #123b54;
+  --brand-070: #1a5778;
+  --brand-060: #247193;
+  --brand-050: #2f8aaf;
+  --brand-040: #62aec9;
+  --brand-030: #9dd1e2;
+  --brand-020: #c9e7f0;
+  --brand-010: #e7f4f9;
+
+  --accent-070: #b45309;
+  --accent-060: #d97706;
+  --accent-050: #f59e0b;
+  --accent-040: #fbbf24;
+  --accent-030: #fcd34d;
+  --accent-010: #fffbeb;
+
+  --success-060: #15803d;
+  --success-050: #22c55e;
+  --success-010: #ecfdf3;
+
+  --danger-060: #b91c1c;
+  --danger-050: #ef4444;
+  --danger-010: #fef2f2;
+
+  --ink-090: #16222b;
+  --ink-070: #3d4d59;
+  --ink-050: #64788a;
+  --ink-030: #a3b3bf;
+  --ink-020: #c9d4dc;
+  --ink-010: #eef2f5;
+
+  --surface-000: #ffffff;
+  --surface-010: #f6f9fb;
+  --surface-020: #eef2f5;
+
+  --shadow-sm: 0 1px 2px rgba(12, 36, 52, 0.08);
+  --shadow-md: 0 6px 16px rgba(12, 36, 52, 0.1);
+  --shadow-lg: 0 16px 32px rgba(12, 36, 52, 0.16);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+}
+
+/* ---------- Brand tokens (dark) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand-090: #e7f4f9;
+    --brand-080: #c9e7f0;
+    --brand-070: #9dd1e2;
+    --brand-060: #62aec9;
+    --brand-050: #2f8aaf;
+    --brand-040: #247193;
+    --brand-030: #1a5778;
+    --brand-020: #123b54;
+    --brand-010: #0c2434;
+
+    --accent-070: #fcd34d;
+    --accent-060: #fbbf24;
+    --accent-050: #f59e0b;
+    --accent-040: #d97706;
+    --accent-030: #b45309;
+    --accent-010: #2a1c05;
+
+    --success-060: #22c55e;
+    --success-050: #4ade80;
+    --success-010: #0d2314;
+
+    --danger-060: #f87171;
+    --danger-050: #ef4444;
+    --danger-010: #2a0e0e;
+
+    --ink-090: #f2f5f7;
+    --ink-070: #c6d2da;
+    --ink-050: #93a6b4;
+    --ink-030: #5d6f7d;
+    --ink-020: #3b4a56;
+    --ink-010: #222e37;
+
+    --surface-000: #15222c;
+    --surface-010: #1b2934;
+    --surface-020: #22323e;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.38);
+    --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Manual theme override (localStorage) beats OS preference */
+html[data-theme="light"] {
+  --brand-090: #0c2434;
+  --brand-080: #123b54;
+  --brand-070: #1a5778;
+  --brand-060: #247193;
+  --brand-050: #2f8aaf;
+  --brand-040: #62aec9;
+  --brand-030: #9dd1e2;
+  --brand-020: #c9e7f0;
+  --brand-010: #e7f4f9;
+
+  --accent-070: #b45309;
+  --accent-060: #d97706;
+  --accent-050: #f59e0b;
+  --accent-040: #fbbf24;
+  --accent-030: #fcd34d;
+  --accent-010: #fffbeb;
+
+  --success-060: #15803d;
+  --success-050: #22c55e;
+  --success-010: #ecfdf3;
+
+  --danger-060: #b91c1c;
+  --danger-050: #ef4444;
+  --danger-010: #fef2f2;
+
+  --ink-090: #16222b;
+  --ink-070: #3d4d59;
+  --ink-050: #64788a;
+  --ink-030: #a3b3bf;
+  --ink-020: #c9d4dc;
+  --ink-010: #eef2f5;
+
+  --surface-000: #ffffff;
+  --surface-010: #f6f9fb;
+  --surface-020: #eef2f5;
+
+  --shadow-sm: 0 1px 2px rgba(12, 36, 52, 0.08);
+  --shadow-md: 0 6px 16px rgba(12, 36, 52, 0.1);
+  --shadow-lg: 0 16px 32px rgba(12, 36, 52, 0.16);
+}
+
+html[data-theme="dark"] {
+  --brand-090: #e7f4f9;
+  --brand-080: #c9e7f0;
+  --brand-070: #9dd1e2;
+  --brand-060: #62aec9;
+  --brand-050: #2f8aaf;
+  --brand-040: #247193;
+  --brand-030: #1a5778;
+  --brand-020: #123b54;
+  --brand-010: #0c2434;
+
+  --accent-070: #fcd34d;
+  --accent-060: #fbbf24;
+  --accent-050: #f59e0b;
+  --accent-040: #d97706;
+  --accent-030: #b45309;
+  --accent-010: #2a1c05;
+
+  --success-060: #22c55e;
+  --success-050: #4ade80;
+  --success-010: #0d2314;
+
+  --danger-060: #f87171;
+  --danger-050: #ef4444;
+  --danger-010: #2a0e0e;
+
+  --ink-090: #f2f5f7;
+  --ink-070: #c6d2da;
+  --ink-050: #93a6b4;
+  --ink-030: #5d6f7d;
+  --ink-020: #3b4a56;
+  --ink-010: #222e37;
+
+  --surface-000: #15222c;
+  --surface-010: #1b2934;
+  --surface-020: #22323e;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Semantic tokens ---------- */
+:root {
+  --bg: var(--surface-010);
+  --surface: var(--surface-000);
+  --surface-alt: var(--surface-020);
+  --text: var(--ink-090);
+  --text-muted: var(--ink-050);
+  --border: var(--ink-010);
+  --brand: var(--brand-050);
+  --brand-strong: var(--brand-080);
+  --brand-soft: var(--brand-010);
+  --brand-contrast: var(--surface-000);
+  --accent: var(--accent-050);
+  --accent-strong: var(--accent-070);
+  --accent-soft: var(--accent-010);
+  --accent-contrast: var(--ink-090);
+  --status-fail: var(--danger-050);
+  --status-fail-soft: var(--danger-010);
+  --status-ok: var(--success-050);
+  --status-ok-soft: var(--success-010);
+
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+
+  /* Game canvas size tokens (logical px; canvas scales via CSS, see game css) */
+  --game-cols: 20;
+  --game-cell: 15px;
+
+  /* Layout */
+  --header-h: 56px;
+  --content-max: 1180px;
+  --tap-target: 48px;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+a {
+  color: var(--brand);
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--brand-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Visually hidden but available to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

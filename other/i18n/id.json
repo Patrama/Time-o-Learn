@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "siteName": "Time-o-Learn",
+    "tagline": "Game belajar seru untuk si kecil"
+  },
+  "nav": {
+    "skip": "Langsung ke game",
+    "back": "Kembali",
+    "close": "Tutup"
+  },
+  "hero": {
+    "kicker": "Main & belajar, di mana saja",
+    "title": "Time-o-Learn",
+    "subtitle": "Game belajar yang seru dan aman untuk balita serta anak SD — bisa dimainkan di HP apa pun, meski koneksinya lambat."
+  },
+  "menu": {
+    "heading": "Pilih game",
+    "loading": "Memuat game…",
+    "error": "Daftar game gagal dimuat. Periksa koneksi lalu coba lagi.",
+    "retry": "Coba lagi",
+    "offlineNote": "Kamu sedang luring — menampilkan daftar game terakhir.",
+    "years": "thn",
+    "noResults": "Tidak ada game yang cocok dengan filter.",
+    "category": "Kategori",
+    "badge": {
+      "free": "Gratis",
+      "trial": "Coba",
+      "rental": "Sewa",
+      "subscription": "Langganan"
+    },
+    "filter": {
+      "all": "Semua",
+      "free": "Gratis",
+      "trial": "Coba",
+      "rental": "Sewa",
+      "subscription": "Langganan"
+    },
+    "cat": {
+      "classic": "Klasik",
+      "puzzle": "Tekateki",
+      "letters": "Huruf",
+      "numbers": "Angka",
+      "memory": "Memori",
+      "other": "Lainnya"
+    },
+    "visitHint": "Ketuk game untuk bermain"
+  },
+  "game": {
+    "play": "Main sekarang",
+    "restart": "Main lagi",
+    "loadError": "Game gagal dimuat.",
+    "backToMenu": "Kembali ke menu",
+    "score": "Skor",
+    "best": "Terbaik",
+    "over": "Permainan selesai",
+    "pause": "Jeda",
+    "resume": "Lanjut"
+  },
+  "lang": {
+    "label": "Bahasa"
+  },
+  "footer": {
+    "rights": "Dibuat dengan penuh perhatian untuk para pembelajar cilik."
+  }
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#15222c" />
+  <title>Snake — Time-o-Learn</title>
+  <link rel="stylesheet" href="../../css/tokens.css" />
+  <link rel="stylesheet" href="../../css/game-shell.css" />
+  <link rel="stylesheet" href="css/snake.css" />
+  <script src="../../other/config.js"></script>
+  <script>
+    // Pages under page/game-content/ read i18n dictionaries two levels up.
+    window.APP_CONFIG.i18nPath = "../../other/i18n/";
+  </script>
+  <script src="../../js/i18n.js"></script>
+</head>
+<body class="game-page">
+  <a class="skip-link" href="#game-stage" data-i18n="nav.skip"></a>
+
+  <header class="game-header">
+    <a class="icon-btn" href="../../index.html" aria-label="Back to menu" data-i18n-attr="aria-label" data-i18n="nav.back">←</a>
+    <h1 class="game-title">Snake</h1>
+    <button class="icon-btn" id="pause-btn" type="button" aria-pressed="false" aria-label="Pause">⏸</button>
+  </header>
+
+  <main class="game-stage-wrap" id="game-stage">
+    <section class="game-stage" aria-label="Snake game">
+      <div class="game-hud">
+        <span class="hud-item" id="hud-score">0</span>
+      </div>
+      <canvas id="snake-canvas" class="game-canvas" width="300" height="300"
+              aria-label="Snake game board" tabindex="0"></canvas>
+      <!-- Overlays (state-driven copy set in snake.js; markup here for a11y) -->
+      <div class="game-overlay" id="overlay-over" role="dialog" aria-modal="true" aria-labelledby="overlay-over-title">
+        <div class="overlay-card">
+          <p class="overlay-title overlay-over" id="overlay-over-title">Game over</p>
+          <span class="overlay-score"></span>
+          <button class="btn-primary" type="button" data-i18n="game.restart">Play again</button>
+        </div>
+      </div>
+      <div class="game-overlay" id="overlay-pause" role="dialog" aria-modal="true" aria-labelledby="overlay-pause-title">
+        <div class="overlay-card">
+          <p class="overlay-title overlay-paused" id="overlay-pause-title">Paused</p>
+          <button class="btn-primary" type="button" data-i18n="game.resume">Resume</button>
+        </div>
+      </div>
+
+      <p class="sr-only" aria-live="polite" id="sr-status"></p>
+      <div class="dpad" aria-label="Direction controls">
+        <span></span>
+        <button class="dpad-btn" type="button" data-dir="up" aria-label="Up">▲</button>
+        <span></span>
+        <button class="dpad-btn" type="button" data-dir="left" aria-label="Left">◀</button>
+        <span></span>
+        <button class="dpad-btn" type="button" data-dir="right" aria-label="Right">▶</button>
+        <span></span>
+        <button class="dpad-btn" type="button" data-dir="down" aria-label="Down">▼</button>
+        <span></span>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/snake.js"></script>
+</body>
+</html>
