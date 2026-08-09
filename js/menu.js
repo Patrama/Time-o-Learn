@@ -4,7 +4,13 @@
  * session (on open), never per in-game interaction. Cards lock immediately on
  * click, show a loading state, and re-enable only after load completes or
  * errors. Result is session-cached in memory (not localStorage).
+ *
+ * Adds content-type grouping (Games / Storybooks / All) above the existing
+ * badge/category filters, per the index.html redesign.
+ *
+ * @format
  */
+
 (function () {
   "use strict";
 
@@ -14,6 +20,7 @@
 
   var state = {
     games: [],
+    groupFilter: "all", // "all" | "game" | "book"
     badgeFilter: "all",
     categoryFilter: "all",
   };
@@ -23,12 +30,10 @@
     if (sessionCache.hasOwnProperty(gameId)) {
       return Promise.resolve(sessionCache[gameId]);
     }
-    // Mock: trial games always pass. Later phases: call Repo B
-    // /api/entitlement-check once here via CONFIG.apiBaseUrl.
     var allowed =
-      (CONFIG.features && CONFIG.features.mockEntitlement === false) ?
-        false :
-        true;
+      CONFIG.features && CONFIG.features.mockEntitlement === false
+        ? false
+        : true;
     var grant = { allowed: allowed, source: "mock" };
     sessionCache[gameId] = grant;
     return Promise.resolve(grant);
@@ -54,7 +59,10 @@
     var card = el("button", "game-card");
     card.type = "button";
     card.setAttribute("data-game", game.id);
-    card.setAttribute("aria-label", gameName(game) + " — " + badgeLabel(game.badge));
+    card.setAttribute(
+      "aria-label",
+      gameName(game) + " — " + badgeLabel(game.badge),
+    );
 
     var thumb = el("span", "game-thumb");
     if (game.thumb) {
@@ -78,9 +86,17 @@
     var info = el("div", "game-info");
     info.appendChild(el("div", "game-name", gameName(game)));
     var meta = el("div", "game-meta");
-    meta.appendChild(el("span", "badge badge-" + (game.badge || "free"), badgeLabel(game.badge)));
+    meta.appendChild(
+      el(
+        "span",
+        "badge badge-" + (game.badge || "free"),
+        badgeLabel(game.badge),
+      ),
+    );
     var ages = game.ageMin + "–" + game.ageMax;
-    meta.appendChild(el("span", "game-ages", ages + " " + I18N.t("menu.years")));
+    meta.appendChild(
+      el("span", "game-ages", ages + " " + I18N.t("menu.years")),
+    );
     info.appendChild(meta);
 
     var arrow = el("span", "game-arrow", "→");
@@ -92,10 +108,22 @@
   }
 
   function matchesFilters(game) {
-    if (state.badgeFilter !== "all" && (game.badge || "free") !== state.badgeFilter) {
+    if (
+      state.groupFilter !== "all" &&
+      (game.contentGroup || "game") !== state.groupFilter
+    ) {
       return false;
     }
-    if (state.categoryFilter !== "all" && game.category !== state.categoryFilter) {
+    if (
+      state.badgeFilter !== "all" &&
+      (game.badge || "free") !== state.badgeFilter
+    ) {
+      return false;
+    }
+    if (
+      state.categoryFilter !== "all" &&
+      game.category !== state.categoryFilter
+    ) {
       return false;
     }
     return true;
@@ -124,22 +152,59 @@
     msg.style.display = hidden ? "block" : "none";
   }
 
+  /* ---------- Content-type tabs (Games / Storybooks / All) ---------- */
+  function setGroup(group) {
+    state.groupFilter = group;
+    document
+      .querySelectorAll(".content-tab[data-group]")
+      .forEach(function (tab) {
+        var active = tab.getAttribute("data-group") === group;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+    // Category sidebar/relevance depends on group — rebuild it.
+    renderSidebar();
+    renderGrid();
+  }
+
+  function bindContentTabs() {
+    document
+      .querySelectorAll(".content-tab[data-group]")
+      .forEach(function (tab) {
+        tab.setAttribute("role", "tab");
+        tab.setAttribute(
+          "aria-selected",
+          tab.classList.contains("active") ? "true" : "false",
+        );
+        tab.addEventListener("click", function () {
+          setGroup(tab.getAttribute("data-group"));
+        });
+      });
+  }
+
   function setFilterBadge(badge) {
     state.badgeFilter = badge;
-    document.querySelectorAll(".filter-chip[data-badge]").forEach(function (chip) {
-      chip.classList.toggle("active", chip.getAttribute("data-badge") === badge);
-    });
-    document.querySelectorAll(".sidebar-chip[data-badge]").forEach(function (chip) {
-      chip.classList.toggle("active", chip.getAttribute("data-badge") === badge);
-    });
+    document
+      .querySelectorAll(".filter-chip[data-badge]")
+      .forEach(function (chip) {
+        chip.classList.toggle(
+          "active",
+          chip.getAttribute("data-badge") === badge,
+        );
+      });
     renderGrid();
   }
 
   function setCategory(cat) {
     state.categoryFilter = cat;
-    document.querySelectorAll(".sidebar-chip[data-category]").forEach(function (chip) {
-      chip.classList.toggle("active", chip.getAttribute("data-category") === cat);
-    });
+    document
+      .querySelectorAll(".sidebar-chip[data-category]")
+      .forEach(function (chip) {
+        chip.classList.toggle(
+          "active",
+          chip.getAttribute("data-category") === cat,
+        );
+      });
     renderGrid();
   }
 
@@ -161,26 +226,38 @@
   }
 
   function renderSidebar() {
-    var sidebar = document.querySelector(".sidebar-filters");
-    if (!sidebar) return;
+    var existing = document.querySelector(".sidebar-filters");
+    if (!existing) return;
     var cats = {};
     state.games.forEach(function (g) {
+      if (
+        state.groupFilter !== "all" &&
+        (g.contentGroup || "game") !== state.groupFilter
+      )
+        return;
       var cat = g.category || "other";
       cats[cat] = (cats[cat] || 0) + 1;
     });
     var list = el("div", "sidebar-filters");
+    list.setAttribute("aria-label", "Categories");
     list.appendChild(el("p", "sidebar-title", I18N.t("menu.category")));
-    Object.keys(cats).sort().forEach(function (cat) {
-      var chip = el("button", "sidebar-chip", I18N.t("menu.cat." + cat) + " (" + cats[cat] + ")");
-      chip.type = "button";
-      chip.setAttribute("data-category", cat);
-      if (cat === state.categoryFilter) chip.classList.add("active");
-      chip.addEventListener("click", function () {
-        setCategory(cat);
+    Object.keys(cats)
+      .sort()
+      .forEach(function (cat) {
+        var chip = el(
+          "button",
+          "sidebar-chip",
+          I18N.t("menu.cat." + cat) + " (" + cats[cat] + ")",
+        );
+        chip.type = "button";
+        chip.setAttribute("data-category", cat);
+        if (cat === state.categoryFilter) chip.classList.add("active");
+        chip.addEventListener("click", function () {
+          setCategory(cat);
+        });
+        list.appendChild(chip);
       });
-      list.appendChild(chip);
-    });
-    sidebar.replaceWith(list);
+    existing.replaceWith(list);
   }
 
   /* ---------- Open game (§4.4 discipline) ---------- */
@@ -220,7 +297,10 @@
     if (!msg) return;
     msg.style.display = "block";
     var btn = msg.querySelector(".retry-btn");
-    if (btn) btn.addEventListener("click", function () { location.reload(); });
+    if (btn)
+      btn.addEventListener("click", function () {
+        location.reload();
+      });
     if (!online) {
       var note = document.getElementById("offline-note");
       if (note) note.classList.add("visible");
@@ -241,13 +321,15 @@
   function bindLangToggle() {
     var toggle = document.getElementById("lang-toggle");
     if (!toggle) return;
-    toggle.querySelector(".lang-code").textContent = I18N.getLang().toUpperCase();
+    toggle.querySelector(".lang-code").textContent =
+      I18N.getLang().toUpperCase();
     toggle.addEventListener("click", function () {
       var next = I18N.toggle();
       toggle.querySelector(".lang-code").textContent = next.toUpperCase();
       if (state.games.length) {
-        setFilterChips(); // re-label chips
-        renderGrid(); // re-label cards
+        setFilterChips();
+        renderSidebar();
+        renderGrid();
       }
     });
   }
@@ -262,6 +344,8 @@
       .catch(function () {
         bindLangToggle(); // still allow toggle even if dicts fail
       });
+
+    bindContentTabs();
 
     CATALOG.load()
       .then(function (result) {

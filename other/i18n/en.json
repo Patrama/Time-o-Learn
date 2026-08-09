@@ -11,7 +11,8 @@
   "hero": {
     "kicker": "Play & learn, anywhere",
     "title": "Time-o-Learn",
-    "subtitle": "Fun, safe learning games for toddlers and elementary kids — play on any phone, even slow ones."
+    "subtitle": "Fun, safe learning games for toddlers and elementary kids — play on any phone, even slow ones.",
+    "trust": "No ads. No strangers. Just learning."
   },
   "menu": {
     "heading": "Games",
@@ -36,14 +37,17 @@
       "subscription": "Subscription"
     },
     "cat": {
-      "classic": "Classic",
-      "puzzle": "Puzzle",
-      "letters": "Letters",
-      "numbers": "Numbers",
-      "memory": "Memory",
+      "counting": "Counting",
+      "matching": "Matching",
+      "reading": "Reading",
       "other": "Other"
     },
-    "visitHint": "Tap a game to play"
+    "visitHint": "Tap a game to play",
+    "group": {
+      "all": "All",
+      "game": "Games",
+      "book": "Storybooks"
+    }
   },
   "game": {
     "play": "Play now",

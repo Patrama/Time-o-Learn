@@ -1,70 +1,146 @@
-<!DOCTYPE html>
+<!-- @format -->
+
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Time-o-Learn — fun learning games for toddlers and elementary kids. Works on any phone, even on slow connections.">
-  <title>Time-o-Learn</title>
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/menu.css">
-  <script src="other/config.js"></script>
-</head>
-<body class="menu-page">
-  <a class="skip-link" href="#game-grid" data-i18n="nav.skip">Skip to games</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Time-o-Learn — fun learning games and storybooks for toddlers and elementary kids. Works on any phone, even on slow connections."
+    />
+    <title>Time-o-Learn</title>
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/menu.css" />
+    <script src="other/config.js"></script>
+  </head>
+  <body class="menu-page">
+    <a class="skip-link" href="#game-grid" data-i18n="nav.skip"
+      >Skip to games</a
+    >
 
-  <header class="app-header">
-    <div class="brand">
-      <span class="brand-logo" aria-hidden="true">TL</span>
-      <span class="brand-name" data-i18n="meta.siteName">Time-o-Learn</span>
-    </div>
-    <button id="lang-toggle" class="lang-toggle" type="button" data-i18n-attr="aria-label" data-i18n="lang.label" aria-label="Language">
-      <span class="lang-dot" aria-hidden="true">🌐</span>
-      <span class="lang-code">EN</span>
-    </button>
-  </header>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-logo" aria-hidden="true">TL</span>
+        <span class="brand-name" data-i18n="meta.siteName">Time-o-Learn</span>
+      </div>
+      <button
+        id="lang-toggle"
+        class="lang-toggle"
+        type="button"
+        data-i18n-attr="aria-label"
+        data-i18n="lang.label"
+        aria-label="Language"
+      >
+        <span class="lang-dot" aria-hidden="true">🌐</span>
+        <span class="lang-code">EN</span>
+      </button>
+    </header>
 
-  <main class="app-main">
-    <section class="hero">
-      <p class="hero-kicker" data-i18n="hero.kicker">Play & learn, anywhere</p>
-      <h1 class="hero-title" data-i18n="hero.title">Time-o-Learn</h1>
-      <p class="hero-subtitle" data-i18n="hero.subtitle">Fun, safe learning games for toddlers and elementary kids — play on any phone, even slow ones.</p>
-    </section>
-
-    <nav class="filter-row" aria-label="Filters">
-      <div class="filter-bar"></div>
-    </nav>
-
-    <div class="layout-with-sidebar">
-      <aside class="sidebar-filters" aria-label="Categories"></aside>
-
-      <section aria-labelledby="menu-heading">
-        <h2 id="menu-heading" class="sr-only" data-i18n="menu.heading">Games</h2>
-
-        <p id="offline-note" class="offline-note" data-i18n="menu.offlineNote" hidden>You're offline — showing the last saved game list.</p>
-        <p id="load-error" class="state-msg" hidden>
-          <span data-i18n="menu.error">Couldn't load the game list. Check your connection and try again.</span>
-          <button class="retry-btn" type="button" data-i18n="menu.retry">Try again</button>
+    <main class="app-main">
+      <section class="hero">
+        <p class="hero-kicker" data-i18n="hero.kicker">
+          Play & learn, anywhere
         </p>
-
-        <div id="game-grid" class="game-grid"></div>
-        <p id="no-results" class="state-msg" data-i18n="menu.noResults" hidden>No games match your filters.</p>
+        <h1 class="hero-title" data-i18n="hero.title">Time-o-Learn</h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">
+          Fun, safe learning games and storybooks for toddlers and elementary
+          kids — play on any phone, even slow ones.
+        </p>
+        <p class="hero-trust" data-i18n="hero.trust">
+          🔒 No ads. No strangers. Just learning.
+        </p>
       </section>
-    </div>
-  </main>
 
-  <footer class="app-footer">
-    <p data-i18n="footer.rights">Made with care for little learners.</p>
-  </footer>
+      <!-- Content-type tabs: Games vs Storybooks vs All. Sits above the -->
+      <!-- existing badge filter row so the biggest, most engagement-relevant -->
+      <!-- choice comes first; badge/category chips refine within it. -->
+      <nav class="content-tabs" aria-label="Content type">
+        <button
+          class="content-tab active"
+          type="button"
+          data-group="all"
+          data-i18n="menu.group.all"
+        >
+          All
+        </button>
+        <button
+          class="content-tab"
+          type="button"
+          data-group="game"
+          data-i18n="menu.group.game"
+        >
+          Games
+        </button>
+        <button
+          class="content-tab"
+          type="button"
+          data-group="book"
+          data-i18n="menu.group.book"
+        >
+          Storybooks
+        </button>
+      </nav>
 
-  <script src="js/i18n.js" defer></script>
-  <script src="js/catalog.js" defer></script>
-  <script src="js/menu.js" defer></script>
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function () {
-        navigator.serviceWorker.register("sw.js").catch(function () {});
-      });
-    }
-  </script>
-</body>
+      <nav class="filter-row" aria-label="Filters">
+        <div class="filter-bar"></div>
+      </nav>
+
+      <div class="layout-with-sidebar">
+        <aside class="sidebar-filters" aria-label="Categories"></aside>
+
+        <section aria-labelledby="menu-heading">
+          <h2 id="menu-heading" class="sr-only" data-i18n="menu.heading">
+            Games
+          </h2>
+
+          <p
+            id="offline-note"
+            class="offline-note"
+            data-i18n="menu.offlineNote"
+            hidden
+          >
+            You're offline — showing the last saved game list.
+          </p>
+          <p id="load-error" class="state-msg" hidden>
+            <span data-i18n="menu.error"
+              >Couldn't load the game list. Check your connection and try
+              again.</span
+            >
+            <button class="retry-btn" type="button" data-i18n="menu.retry">
+              Try again
+            </button>
+          </p>
+
+          <div id="game-grid" class="game-grid"></div>
+          <p
+            id="no-results"
+            class="state-msg"
+            data-i18n="menu.noResults"
+            hidden
+          >
+            No games match your filters.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p data-i18n="footer.rights">Made with care for little learners.</p>
+    </footer>
+
+    <script src="js/i18n.js" defer></script>
+    <script src="js/catalog.js" defer></script>
+    <script src="js/menu.js" defer></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("sw.js").catch(function () {});
+        });
+      }
+    </script>
+  </body>
 </html>

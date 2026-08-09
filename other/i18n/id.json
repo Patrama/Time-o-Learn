@@ -11,7 +11,8 @@
   "hero": {
     "kicker": "Main & belajar, di mana saja",
     "title": "Time-o-Learn",
-    "subtitle": "Game belajar yang seru dan aman untuk balita serta anak SD — bisa dimainkan di HP apa pun, meski koneksinya lambat."
+    "subtitle": "Game belajar yang seru dan aman untuk balita serta anak SD — bisa dimainkan di HP apa pun, meski koneksinya lambat.",
+    "trust": "Tanpa iklan. Tanpa orang asing. Hanya belajar."
   },
   "menu": {
     "heading": "Pilih game",
@@ -36,14 +37,17 @@
       "subscription": "Langganan"
     },
     "cat": {
-      "classic": "Klasik",
-      "puzzle": "Tekateki",
-      "letters": "Huruf",
-      "numbers": "Angka",
-      "memory": "Memori",
+      "counting": "Berhitung",
+      "matching": "Mencocokkan",
+      "reading": "Membaca",
       "other": "Lainnya"
     },
-    "visitHint": "Ketuk game untuk bermain"
+    "visitHint": "Ketuk game untuk bermain",
+    "group": {
+      "all": "Semua",
+      "game": "Game",
+      "book": "Buku Cerita"
+    }
   },
   "game": {
     "play": "Main sekarang",

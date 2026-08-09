@@ -2,6 +2,8 @@
  * Time-o-Learn — Menu page styles.
  * Mobile-first (§4.1): base = phone (375px reference). Larger sizes only
  * ADD columns / chrome via min-width queries. No max-width overrides.
+ *
+ * @format
  */
 
 /* ---------- App shell ---------- */
@@ -51,7 +53,11 @@
   width: 2rem;
   height: 2rem;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand) 0%,
+    var(--brand-strong) 100%
+  );
   color: var(--brand-contrast);
   display: inline-flex;
   align-items: center;
@@ -475,5 +481,73 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--brand);
+  }
+}
+
+/* ============================================================
+   Additions for the redesigned index.html — content-type tabs
+   and hero trust line. Append to css/menu.css (does not replace
+   existing rules; phone-first, same token set).
+   ============================================================ */
+
+/* ---------- Hero trust line ---------- */
+.hero-trust {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--status-ok);
+}
+
+/* ---------- Content-type tabs (Games / Storybooks / All) ---------- */
+.content-tabs {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.25rem 1rem 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.content-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.content-tab {
+  flex: 1 1 0;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.content-tab.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-contrast);
+}
+
+@media (min-width: 600px) {
+  .content-tabs {
+    padding-inline: 1.25rem;
+  }
+  .content-tab {
+    flex: none;
+    min-width: 140px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content-tabs {
+    padding-inline: 0;
+    max-width: var(--content-max);
+    margin-inline: auto;
   }
 }
