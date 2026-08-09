@@ -3,8 +3,7 @@
 /un-deployed
 
 # Other files and folders
-.tmp_clay.html
-.tmp_glass.html
+*_BU
 
 # Executables
 

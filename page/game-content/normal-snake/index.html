@@ -8,28 +8,53 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#15222c" />
+    <meta name="theme-color" content="#f5e6d3" />
     <title>Snake — Time-o-Learn</title>
 
     <style>
       /* ============================================================
-       Tokens & Base Variables (tokens.css fallback)
+       Tokens & Base Variables (claymorphism palette)
        ============================================================ */
       :root {
-        --surface-000: #15222c;
-        --surface-010: #1d2d3a;
-        --surface: #243647;
-        --brand-050: #4ade80;
-        --brand-strong: #22c55e;
-        --brand: #22c55e;
-        --status-ok: #f43f5e;
-        --status-fail: #ef4444;
-        --text: #ffffff;
-        --text-muted: #94a3b8;
-        --radius-md: 8px;
-        --radius-lg: 12px;
+        --surface-000: #f5e6d3;
+        --surface-010: #fdebd6;
+        --surface: #fdf1e0;
+        --surface-deep: #efd9bd;
+
+        --clay-shadow-dark: #d3b795;
+        --clay-shadow-light: #fff7ea;
+
+        --brand-050: #63b855;
+        --brand-strong: #3f8a34;
+        --brand: #7dcf6c;
+
+        --status-ok: #f0653f;
+        --status-fail: #d2544c;
+
+        --text: #4a3a2e;
+        --text-muted: #7d6a58;
+
+        --game-board: #f2ddc0;
+        --game-cell-a: #f6e4c8;
+        --game-cell-b: #edd5b4;
+        --snake-shadow: rgba(139, 108, 71, 0.4);
+        --food-deep: #cf4f2e;
+        --food-highlight: rgba(255, 255, 255, 0.7);
+
+        --radius-md: 18px;
+        --radius-lg: 28px;
         --radius-full: 9999px;
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+
+        --shadow-clay-sm:
+          4px 4px 0 var(--clay-shadow-dark),
+          -3px -3px 0 var(--clay-shadow-light);
+        --shadow-clay-lg:
+          10px 10px 0 var(--clay-shadow-dark),
+          -6px -6px 0 var(--clay-shadow-light);
+        --shadow-clay-inset:
+          inset 4px 4px 8px rgba(190, 150, 110, 0.45),
+          inset -4px -4px 8px rgba(255, 255, 255, 0.65);
+
         --game-cols: 20;
         --game-cell: 18px;
       }
@@ -43,7 +68,10 @@
       body.game-page {
         margin: 0;
         padding: 0;
-        background-color: var(--surface-000);
+        background:
+          radial-gradient(circle at 15% 12%, #fdf6e8 0%, transparent 55%),
+          radial-gradient(circle at 85% 88%, #f9e6cc 0%, transparent 55%),
+          var(--surface-000);
         color: var(--text);
         font-family:
           system-ui,
@@ -56,15 +84,19 @@
       }
       .skip-link {
         position: absolute;
-        top: -40px;
+        top: -60px;
         left: 0;
-        background: var(--brand);
-        color: var(--surface-000);
-        padding: 8px;
+        background: var(--brand-strong);
+        color: #ffffff;
+        padding: 10px 16px;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        text-decoration: none;
         z-index: 100;
       }
       .skip-link:focus {
-        top: 0;
+        top: 12px;
+        left: 12px;
       }
       .game-header {
         width: 100%;
@@ -72,33 +104,57 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1rem;
+        padding: 1.25rem 1rem 0.75rem;
       }
       .game-title {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text);
       }
       .icon-btn {
         background: var(--surface-010);
         color: var(--text);
         border: none;
         border-radius: var(--radius-md);
-        padding: 0.5rem 0.8rem;
+        padding: 0.6rem 0.9rem;
         cursor: pointer;
         text-decoration: none;
         font-size: 1.1rem;
+        font-weight: 700;
+        box-shadow: var(--shadow-clay-sm);
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+      }
+      .icon-btn:hover {
+        transform: translateY(-1px);
+      }
+      .icon-btn:active {
+        transform: translateY(2px);
+        box-shadow: var(--shadow-clay-inset);
+      }
+      .icon-btn:focus-visible {
+        outline: 3px solid
+          color-mix(in srgb, var(--brand-strong) 55%, transparent);
+        outline-offset: 2px;
       }
       .game-stage-wrap {
         width: 100%;
         display: flex;
         justify-content: center;
-        padding: 0 1rem 1rem;
+        padding: 0.5rem 1rem 1.5rem;
       }
       .game-hud {
         font-size: 1.5rem;
-        font-weight: bold;
+        font-weight: 800;
         text-align: center;
-        margin-bottom: 0.5rem;
+        margin: 0 auto 0.9rem;
+        width: fit-content;
+        min-width: 132px;
+        padding: 0.35rem 1.6rem;
+        background: var(--surface);
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-clay-sm);
+        color: var(--text);
       }
       .sr-only {
         position: absolute;
@@ -114,19 +170,33 @@
       .dpad {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 5px;
+        gap: 8px;
         width: 180px;
-        margin: 1rem auto 0;
+        margin: 1.25rem auto 0;
       }
       .dpad-btn {
         background: var(--surface-010);
         color: var(--text);
         border: none;
-        border-radius: var(--radius-md);
+        border-radius: var(--radius-full);
         padding: 12px;
         font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1;
+        aspect-ratio: 1;
         cursor: pointer;
         touch-action: manipulation;
+        box-shadow: var(--shadow-clay-sm);
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+      }
+      .dpad-btn:active {
+        transform: translateY(2px);
+        box-shadow: var(--shadow-clay-inset);
+      }
+      .dpad-btn:focus-visible {
+        outline: 3px solid
+          color-mix(in srgb, var(--brand-strong) 55%, transparent);
+        outline-offset: 2px;
       }
 
       /* ============================================================
@@ -145,8 +215,13 @@
         touch-action: none;
         cursor: pointer;
         display: block;
-        background: var(--surface-010);
-        border-radius: var(--radius-md);
+        background: var(--game-board);
+        border-radius: var(--radius-lg);
+        border: 4px solid var(--surface-010);
+        box-shadow:
+          var(--shadow-clay-sm),
+          inset 5px 5px 10px rgba(190, 150, 110, 0.4),
+          inset -5px -5px 10px rgba(255, 255, 255, 0.55);
       }
 
       #hud-score {
@@ -158,7 +233,8 @@
         inset: 0;
         display: none;
         place-items: center;
-        background: color-mix(in srgb, var(--surface-000) 72%, transparent);
+        background: color-mix(in srgb, var(--surface-deep) 62%, transparent);
+        backdrop-filter: blur(2px);
         border-radius: var(--radius-lg);
         z-index: 10;
       }
@@ -169,10 +245,11 @@
 
       .overlay-card {
         text-align: center;
-        padding: 1.5rem;
+        padding: 1.75rem 2.25rem;
         background: var(--surface);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-lg);
+        border-radius: var(--radius-lg);
+        border: 3px solid var(--surface-010);
+        box-shadow: var(--shadow-clay-lg);
         max-width: 90%;
       }
 
@@ -188,12 +265,12 @@
       }
 
       .overlay-paused {
-        color: var(--brand);
+        color: var(--brand-strong);
       }
 
       .overlay-score {
         display: block;
-        margin: 0 0 1rem;
+        margin: 0 0 1.1rem;
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--text-muted);
@@ -201,20 +278,29 @@
 
       .btn-primary {
         display: inline-block;
-        min-width: 132px;
-        padding: 0.8rem 1.4rem;
+        min-width: 140px;
+        padding: 0.85rem 1.5rem;
         border: none;
         border-radius: var(--radius-full);
         background: var(--brand);
-        color: var(--surface-000);
+        color: #24351f;
         font-size: 1rem;
-        font-weight: 700;
+        font-weight: 800;
         cursor: pointer;
         touch-action: manipulation;
+        box-shadow: var(--shadow-clay-sm);
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
       }
 
       .btn-primary:active {
-        transform: translateY(1px);
+        transform: translateY(2px);
+        box-shadow: var(--shadow-clay-inset);
+      }
+
+      .btn-primary:focus-visible {
+        outline: 3px solid
+          color-mix(in srgb, var(--brand-strong) 55%, transparent);
+        outline-offset: 2px;
       }
 
       @media (min-width: 600px) {
@@ -228,7 +314,10 @@
 
       @media (prefers-reduced-motion: reduce) {
         .game-overlay,
-        .overlay-card {
+        .overlay-card,
+        .icon-btn,
+        .dpad-btn,
+        .btn-primary {
           transition: none;
         }
       }
@@ -510,12 +599,27 @@
         var palette = null;
         function loadPalette() {
           palette = {
-            bg: cssVar("--surface-000"),
-            board: cssVar("--surface-010"),
+            board: cssVar("--game-board"),
+            cellA: cssVar("--game-cell-a"),
+            cellB: cssVar("--game-cell-b"),
             snake: cssVar("--brand-050"),
             snakeHead: cssVar("--brand-strong"),
+            snakeShadow: cssVar("--snake-shadow"),
             food: cssVar("--status-ok"),
+            foodDeep: cssVar("--food-deep"),
+            foodHighlight: cssVar("--food-highlight"),
           };
+        }
+
+        function rrect(x, y, w, h, r) {
+          r = Math.min(r, w / 2, h / 2);
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.arcTo(x + w, y, x + w, y + h, r);
+          ctx.arcTo(x + w, y + h, x, y + h, r);
+          ctx.arcTo(x, y + h, x, y, r);
+          ctx.arcTo(x, y, x + w, y, r);
+          ctx.closePath();
         }
 
         function draw() {
@@ -524,37 +628,55 @@
           var cw = w / COLS;
           var ch = h / ROWS;
 
+          // Recessed clay board
           ctx.fillStyle = palette.board;
           ctx.fillRect(0, 0, w, h);
 
-          ctx.fillStyle = palette.bg;
+          // Clay checkerboard
           for (var y = 0; y < ROWS; y++) {
             for (var x = 0; x < COLS; x++) {
-              if ((x + y) % 2 === 0) ctx.fillRect(x * cw, y * ch, cw, ch);
+              ctx.fillStyle = (x + y) % 2 === 0 ? palette.cellA : palette.cellB;
+              ctx.fillRect(x * cw, y * ch, cw, ch);
             }
           }
 
-          ctx.fillStyle = palette.food;
-          ctx.beginPath();
-          ctx.arc(
-            (food.x + 0.5) * cw,
-            (food.y + 0.5) * ch,
-            Math.min(cw, ch) * 0.36,
-            0,
-            Math.PI * 2,
+          // Glossy clay food ball
+          var fx = (food.x + 0.5) * cw;
+          var fy = (food.y + 0.5) * ch;
+          var fr = Math.min(cw, ch) * 0.38;
+          var grad = ctx.createRadialGradient(
+            fx - fr * 0.35,
+            fy - fr * 0.35,
+            fr * 0.1,
+            fx,
+            fy,
+            fr,
           );
+          grad.addColorStop(0, palette.foodHighlight);
+          grad.addColorStop(0.45, palette.food);
+          grad.addColorStop(1, palette.foodDeep);
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(fx, fy, fr, 0, Math.PI * 2);
           ctx.fill();
 
+          // Clay pellet snake
           for (var i = 0; i < snake.length; i++) {
             var seg = snake[i];
-            var pad = Math.max(1, Math.min(cw, ch) * 0.12);
+            var pad = Math.max(1, Math.min(cw, ch) * 0.16);
+            var r = Math.min(cw, ch) * 0.3;
+            var sx = seg.x * cw + pad;
+            var sy = seg.y * ch + pad;
+            var sw = cw - pad * 2;
+            var sh = ch - pad * 2;
+
+            ctx.fillStyle = palette.snakeShadow;
+            rrect(sx + 2, sy + 2, sw, sh, r);
+            ctx.fill();
+
             ctx.fillStyle = i === 0 ? palette.snakeHead : palette.snake;
-            ctx.fillRect(
-              seg.x * cw + pad,
-              seg.y * ch + pad,
-              cw - pad * 2,
-              ch - pad * 2,
-            );
+            rrect(sx, sy, sw, sh, r);
+            ctx.fill();
           }
         }
 
