@@ -1,0 +1,488 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toddler Learning Game</title>
+    <style>
+      :root {
+        --primary: #4caf50;
+        --secondary: #ffc107;
+        --accent: #2196f3;
+        --background: #e0f7fa;
+        --text: #333;
+        --error: #f44336;
+      }
+
+      body {
+        font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+        background-color: var(--background);
+        color: var(--text);
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: #ff5722;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+      }
+
+      .container {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        max-width: 650px;
+        width: 100%;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        border-radius: 15px;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        margin: 6px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      button:active {
+        transform: translateY(4px);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: white;
+      }
+      .btn-secondary {
+        background-color: var(--secondary);
+        color: #333;
+      }
+      .btn-accent {
+        background-color: var(--accent);
+        color: white;
+      }
+
+      .settings-group {
+        margin: 15px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border: 2px solid #e9ecef;
+      }
+
+      .settings-group h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #444;
+      }
+
+      .options-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+      }
+
+      .selected-btn {
+        border: 4px solid #333 !important;
+        transform: scale(1.03);
+      }
+
+      /* Game Screen Styles */
+      #hint-display {
+        font-size: 5rem;
+        margin: 15px 0;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #options-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .option-btn {
+        font-size: 3rem;
+        padding: 15px;
+        min-width: 90px;
+        background-color: white;
+        border: 4px solid var(--primary);
+      }
+
+      .option-btn.text-option {
+        font-size: 1.6rem;
+        min-width: 140px;
+      }
+
+      #feedback {
+        margin-top: 20px;
+        font-size: 1.4rem;
+        font-weight: bold;
+        min-height: 40px;
+      }
+
+      .correct-text {
+        color: var(--primary);
+      }
+      .wrong-text {
+        color: var(--error);
+      }
+
+      #progress {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      #score-display {
+        font-size: 3rem;
+        color: var(--primary);
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🌟 Play & Learn! 🌟</h1>
+
+    <!-- MAIN MENU -->
+    <div id="menu-screen" class="container">
+      <h2>Game Setup</h2>
+
+      <div class="settings-group">
+        <h3>1. Game Mode</h3>
+        <div class="options-grid">
+          <button
+            id="mode-normal"
+            class="btn-primary selected-btn"
+            onclick="setMode('normal')"
+          >
+            😊 Normal<br /><small>(Learn & Try Again)</small>
+          </button>
+          <button
+            id="mode-score"
+            class="btn-secondary"
+            onclick="setMode('score')"
+          >
+            🏆 Score<br /><small>(Test Your Skills)</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>2. Question Type</h3>
+        <div class="options-grid">
+          <button
+            id="qtype-1"
+            class="btn-accent selected-btn"
+            onclick="setQuestionType(1)"
+          >
+            Type 1<br /><small>Text ➔ Emoticon</small>
+          </button>
+          <button id="qtype-2" class="btn-accent" onclick="setQuestionType(2)">
+            Type 2<br /><small>Emoticon ➔ Text</small>
+          </button>
+          <button id="qtype-3" class="btn-accent" onclick="setQuestionType(3)">
+            Type 3<br /><small>Match Emoticon</small>
+          </button>
+          <button id="qtype-4" class="btn-accent" onclick="setQuestionType(4)">
+            Type 4<br /><small>🎲 Random Mix</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>3. Difficulty</h3>
+        <div class="options-grid">
+          <button class="btn-primary" onclick="startGame(1)">
+            ⭐ Easy<br /><small>(3 Options)</small>
+          </button>
+          <button class="btn-primary" onclick="startGame(2)">
+            ⭐⭐ Medium<br /><small>(4 Options)</small>
+          </button>
+          <button class="btn-primary" onclick="startGame(3)">
+            ⭐⭐⭐ Hard<br /><small>(5 Options)</small>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="container hidden">
+      <div id="progress">Question 1 of 10</div>
+
+      <div id="question-text" style="font-size: 1.4rem; color: #555">
+        Find the correct answer:
+      </div>
+      <div id="hint-display">🍎</div>
+
+      <div id="options-container">
+        <!-- Options injected by JS -->
+      </div>
+
+      <div id="feedback"></div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="container hidden">
+      <h2>🎉 All Done! 🎉</h2>
+      <div id="score-display"></div>
+      <button class="btn-primary" onclick="returnToMenu()">Play Again!</button>
+    </div>
+
+    <script>
+      // --- DICTIONARY ---
+      const dictionary = [
+        { text: "apple", emoji: "🍎" },
+        { text: "book", emoji: "📖" },
+        { text: "cat", emoji: "🐱" },
+        { text: "dog", emoji: "🐶" },
+        { text: "car", emoji: "🚗" },
+        { text: "sun", emoji: "☀️" },
+        { text: "moon", emoji: "🌙" },
+        { text: "tree", emoji: "🌳" },
+        { text: "ball", emoji: "⚽" },
+        { text: "flower", emoji: "🌸" },
+        { text: "fish", emoji: "🐟" },
+        { text: "bird", emoji: "🐦" },
+        { text: "train", emoji: "🚂" },
+        { text: "house", emoji: "🏠" },
+        { text: "star", emoji: "⭐" },
+        { text: "banana", emoji: "🍌" },
+        { text: "cow", emoji: "🐮" },
+        { text: "pig", emoji: "🐷" },
+        { text: "rocket", emoji: "🚀" },
+        { text: "heart", emoji: "❤️" },
+      ];
+
+      // --- GAME STATE ---
+      let currentMode = "normal"; // 'normal' or 'score'
+      let selectedType = 1; // 1, 2, 3, or 4 (Random Mix)
+      let currentDifficulty = 1; // 1, 2, or 3
+      let currentQuestionIndex = 0;
+      let score = 0;
+      let questions = [];
+      const TOTAL_QUESTIONS = 10; // Adjustable total number of questions
+
+      // --- DOM ELEMENTS ---
+      const menuScreen = document.getElementById("menu-screen");
+      const gameScreen = document.getElementById("game-screen");
+      const endScreen = document.getElementById("end-screen");
+      const hintDisplay = document.getElementById("hint-display");
+      const optionsContainer = document.getElementById("options-container");
+      const feedbackDiv = document.getElementById("feedback");
+      const progressDiv = document.getElementById("progress");
+      const scoreDisplay = document.getElementById("score-display");
+
+      // --- HELPER FUNCTIONS ---
+      function shuffleArray(array) {
+        let curId = array.length;
+        while (0 !== curId) {
+          let randId = Math.floor(Math.random() * curId);
+          curId -= 1;
+          let tmp = array[curId];
+          array[curId] = array[randId];
+          array[randId] = tmp;
+        }
+        return array;
+      }
+
+      function setMode(mode) {
+        currentMode = mode;
+        document
+          .getElementById("mode-normal")
+          .classList.toggle("selected-btn", mode === "normal");
+        document
+          .getElementById("mode-score")
+          .classList.toggle("selected-btn", mode === "score");
+      }
+
+      function setQuestionType(type) {
+        selectedType = type;
+        for (let i = 1; i <= 4; i++) {
+          document
+            .getElementById(`qtype-${i}`)
+            .classList.toggle("selected-btn", i === type);
+        }
+      }
+
+      // --- GAME LOGIC ---
+      function startGame(difficultyLevel) {
+        currentDifficulty = difficultyLevel;
+        currentQuestionIndex = 0;
+        score = 0;
+
+        // Options count based on difficulty: 1 star = 3 options, 2 = 4, 3 = 5
+        const numOptions = difficultyLevel + 2;
+
+        generateQuestions(TOTAL_QUESTIONS, numOptions);
+
+        menuScreen.classList.add("hidden");
+        endScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
+
+        renderQuestion();
+      }
+
+      function generateQuestions(numQuestions, numOptions) {
+        questions = [];
+
+        for (let i = 0; i < numQuestions; i++) {
+          // Determine question type (1, 2, or 3) based on user choice
+          let questionType = selectedType;
+          if (selectedType === 4) {
+            questionType = Math.floor(Math.random() * 3) + 1; // Randomize type if Type 4
+          }
+
+          // Select correct item
+          const correctItem =
+            dictionary[Math.floor(Math.random() * dictionary.length)];
+
+          // Select wrong choices
+          let availableWrongItems = dictionary.filter(
+            (item) => item.text !== correctItem.text,
+          );
+          availableWrongItems = shuffleArray(availableWrongItems);
+          const wrongItems = availableWrongItems.slice(0, numOptions - 1);
+
+          // Combine and shuffle options
+          let options = [correctItem, ...wrongItems];
+          options = shuffleArray(options);
+
+          questions.push({
+            type: questionType,
+            correctItem: correctItem,
+            options: options,
+          });
+        }
+      }
+
+      function renderQuestion() {
+        feedbackDiv.innerHTML = "";
+        const currentQ = questions[currentQuestionIndex];
+        progressDiv.innerText = `Question ${currentQuestionIndex + 1} of ${TOTAL_QUESTIONS}`;
+
+        // Set up hint and display rules based on Question Type:
+        // Type 1: Text hint -> Emoticon answer
+        // Type 2: Emoticon hint -> Text answer
+        // Type 3: Emoticon hint -> Emoticon answer (Match)
+        if (currentQ.type === 1) {
+          hintDisplay.innerText = currentQ.correctItem.text.toUpperCase();
+          hintDisplay.style.fontSize = "3.5rem";
+        } else {
+          hintDisplay.innerText = currentQ.correctItem.emoji;
+          hintDisplay.style.fontSize = "6rem";
+        }
+
+        // Create Option Buttons
+        optionsContainer.innerHTML = "";
+        currentQ.options.forEach((option) => {
+          const btn = document.createElement("button");
+          btn.classList.add("option-btn");
+
+          if (currentQ.type === 2) {
+            // Type 2 has text options
+            btn.innerText = option.text.toUpperCase();
+            btn.classList.add("text-option");
+          } else {
+            // Type 1 & Type 3 have emoticon options
+            btn.innerText = option.emoji;
+          }
+
+          btn.onclick = () => handleAnswer(option, btn);
+          optionsContainer.appendChild(btn);
+        });
+      }
+
+      function handleAnswer(selectedItem, btnElement) {
+        const currentQ = questions[currentQuestionIndex];
+        const isCorrect = selectedItem.text === currentQ.correctItem.text;
+
+        if (currentMode === "normal") {
+          if (isCorrect) {
+            feedbackDiv.innerHTML =
+              "<span class='correct-text'>Yay! Good Job! 🌟</span>";
+            disableAllButtons();
+            setTimeout(nextQuestion, 1500);
+          } else {
+            btnElement.style.opacity = "0.4";
+            btnElement.onclick = null; // Prevent re-clicking the same wrong answer
+
+            let hintStr = `Oops! That's ${selectedItem.emoji} (${selectedItem.text}). `;
+            if (currentQ.type === 3) {
+              hintStr += `Find the matching ${currentQ.correctItem.emoji}!`;
+            } else {
+              hintStr += "Try again!";
+            }
+            feedbackDiv.innerHTML = `<span class='wrong-text'>${hintStr}</span>`;
+          }
+        } else if (currentMode === "score") {
+          disableAllButtons();
+          if (isCorrect) {
+            score++;
+            feedbackDiv.innerHTML =
+              "<span class='correct-text'>Correct! ✅</span>";
+            btnElement.style.backgroundColor = "#C8E6C9";
+          } else {
+            feedbackDiv.innerHTML = `<span class='wrong-text'>Wrong! ❌ It was ${currentQ.correctItem.emoji} (${currentQ.correctItem.text})</span>`;
+            btnElement.style.backgroundColor = "#FFCDD2";
+          }
+          setTimeout(nextQuestion, 1500);
+        }
+      }
+
+      function disableAllButtons() {
+        const buttons = document.querySelectorAll(".option-btn");
+        buttons.forEach((btn) => (btn.onclick = null));
+      }
+
+      function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < TOTAL_QUESTIONS) {
+          renderQuestion();
+        } else {
+          showEndScreen();
+        }
+      }
+
+      function showEndScreen() {
+        gameScreen.classList.add("hidden");
+        endScreen.classList.remove("hidden");
+
+        if (currentMode === "score") {
+          scoreDisplay.innerText = `${score} / ${TOTAL_QUESTIONS}`;
+        } else {
+          scoreDisplay.innerHTML = "⭐⭐⭐<br>You are a star!";
+        }
+      }
+
+      function returnToMenu() {
+        endScreen.classList.add("hidden");
+        menuScreen.classList.remove("hidden");
+      }
+    </script>
+  </body>
+</html>

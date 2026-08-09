@@ -42,7 +42,7 @@
       ageMin: 4,
       ageMax: 10,
       badge: "trial",
-      path: "page/game-content/snake/snake.html",
+      path: "page/game-content/snake/index.html",
       emoji: "🐍",
       thumb: "",
       featured: true,
@@ -67,21 +67,23 @@
   }
 
   /**
-   * Path convention matching the real page/ tree:
-   *   game             -> page/game-content/<id>/<id>.html
-   *   book_interactive -> page/book-content/interactive/<id>/<id>.html
-   *   book_static      -> page/book-content/static/<id>/<id>.html
+   * Path convention matching the real page/ tree. Every game/book folder
+   * contains an index.html (standard convention — the folder name IS the
+   * id, so the file doesn't need to repeat it):
+   *   game             -> page/game-content/<id>/index.html
+   *   book_interactive -> page/book-content/interactive/<id>/index.html
+   *   book_static      -> page/book-content/static/<id>/index.html
    * Unknown/missing content_type defaults to "game" (today's only type).
    */
   function defaultPath(id, contentType) {
     switch (contentType) {
       case "book_interactive":
-        return "page/book-content/interactive/" + id + "/" + id + ".html";
+        return "page/book-content/interactive/" + id + "/index.html";
       case "book_static":
-        return "page/book-content/static/" + id + "/" + id + ".html";
+        return "page/book-content/static/" + id + "/index.html";
       case "game":
       default:
-        return "page/game-content/" + id + "/" + id + ".html";
+        return "page/game-content/" + id + "/index.html";
     }
   }
 

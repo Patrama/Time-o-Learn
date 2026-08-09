@@ -1,0 +1,1299 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape"
+    />
+    <title>Snake Stack 🐍</title>
+    <style>
+      /* ============ CLAY DESIGN TOKENS ============ */
+      :root {
+        --clay-bg: linear-gradient(
+          135deg,
+          #fde8f0 0%,
+          #fef3e2 45%,
+          #e3edff 100%
+        );
+        --clay-surface: #fff7f1;
+        --clay-surface-2: #fff0e6;
+        --clay-rim: #e8c8b2;
+        --clay-rim-strong: #d98e5f;
+        --clay-ink: #4a3f5c;
+        --clay-ink-soft: #8a7a9a;
+        --clay-well: #f6dfd0;
+        --clay-well-inset: rgba(173, 105, 63, 0.18);
+        --clay-shadow: rgba(163, 105, 78, 0.22);
+        --clay-highlight: rgba(255, 255, 255, 0.7);
+        --primary: #3b82f6;
+        --primary-deep: #2563eb;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+
+      html,
+      body {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden !important;
+        background: var(--clay-bg);
+        background-attachment: fixed;
+        color: var(--clay-ink);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Landscape Enforcer Overlay */
+      @media screen and (orientation: portrait) {
+        body::before {
+          content: "🔄 Please rotate your device to Landscape Mode!";
+          position: fixed;
+          inset: 0;
+          background: linear-gradient(160deg, #4a3f5c 0%, #6d4f7e 100%);
+          color: #ffffff;
+          font-size: 1.5rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 20px;
+          z-index: 99999;
+        }
+      }
+
+      /* ============ GLASS HELPERS (subtle, overlays only) ============ */
+      .glass {
+        background: rgba(255, 255, 255, 0.32);
+        backdrop-filter: blur(14px) saturate(1.35);
+        -webkit-backdrop-filter: blur(14px) saturate(1.35);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        box-shadow:
+          0 24px 48px rgba(122, 92, 128, 0.25),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+
+      /* Graceful clay fallback when backdrop-filter is unsupported */
+      @supports not (
+        (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+      ) {
+        .glass {
+          background: linear-gradient(
+            160deg,
+            #fde3f0 0%,
+            #f6e8ff 60%,
+            #e6edff 100%
+          );
+        }
+      }
+
+      .game-container {
+        width: 98vw;
+        height: 96vh;
+        background: var(--clay-surface);
+        border-radius: 28px;
+        padding: 8px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow:
+          0 20px 40px var(--clay-shadow),
+          inset 0 2px 0 var(--clay-highlight);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        contain: layout style;
+      }
+
+      /* ============ CONTROL HEADER ============ */
+      .header-bar {
+        height: 8vh;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--clay-surface-2);
+        border-radius: 18px;
+        padding: 0 14px;
+        box-shadow:
+          inset 0 2px 3px var(--clay-highlight),
+          inset 0 -2px 4px rgba(173, 105, 63, 0.12),
+          0 6px 14px rgba(163, 105, 78, 0.16);
+      }
+
+      .title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--clay-ink);
+        letter-spacing: -0.3px;
+      }
+
+      .controls-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .turn-indicator {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #1d4ed8;
+        background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        padding: 6px 14px;
+        border-radius: 16px;
+        display: none;
+        box-shadow:
+          0 3px 8px rgba(59, 130, 246, 0.25),
+          inset 0 1px 2px var(--clay-highlight);
+      }
+
+      /* ============ CLAY BUTTONS ============ */
+      .clay-btn {
+        border: none;
+        cursor: pointer;
+        padding: 8px 16px;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 0.8rem;
+        font-family: inherit;
+        color: var(--clay-ink);
+        background: linear-gradient(145deg, #ffffff 0%, #f7e8da 100%);
+        box-shadow:
+          0 6px 12px rgba(163, 105, 78, 0.22),
+          inset 0 2px 3px var(--clay-highlight),
+          inset 0 -2px 4px rgba(163, 105, 78, 0.15);
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+      }
+
+      .clay-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .clay-btn:active {
+        transform: translateY(1px);
+        box-shadow:
+          0 2px 5px rgba(163, 105, 78, 0.2),
+          inset 0 3px 6px rgba(163, 105, 78, 0.2),
+          inset 0 2px 3px var(--clay-highlight);
+      }
+
+      .btn-reset {
+        background: linear-gradient(145deg, #ff9d87 0%, #f0563e 100%);
+        color: #fff;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow:
+          0 6px 12px rgba(207, 62, 40, 0.3),
+          inset 0 2px 3px rgba(255, 255, 255, 0.45),
+          inset 0 -2px 4px rgba(140, 32, 15, 0.25);
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+      }
+
+      .btn-reset:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-reset:active {
+        transform: translateY(1px);
+        box-shadow:
+          0 2px 5px rgba(207, 62, 40, 0.25),
+          inset 0 3px 6px rgba(140, 32, 15, 0.25);
+      }
+
+      /* ============ MAIN SPLIT AREA ============ */
+      .main-layout {
+        height: 85vh;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      /* Top Area: Active Draggable Bank */
+      .bank-section {
+        height: 38vh;
+        background: var(--clay-surface);
+        border: 2px dashed var(--clay-rim);
+        border-radius: 20px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: inset 0 2px 4px rgba(173, 105, 63, 0.08);
+      }
+
+      .bank-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--clay-ink-soft);
+        margin-bottom: 4px;
+        text-align: center;
+      }
+
+      .bank-pieces {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: center;
+        gap: 6px;
+        overflow: hidden;
+        contain: layout style;
+      }
+
+      /* Bottom Area: Clay Stack Tray */
+      .board-section {
+        height: 45vh;
+        background: linear-gradient(145deg, #ffe8d9 0%, #ffd9bf 100%);
+        border: 4px solid var(--clay-rim-strong);
+        border-radius: 22px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow:
+          inset 0 4px 8px rgba(180, 110, 60, 0.15),
+          inset 0 -3px 6px var(--clay-highlight),
+          0 10px 20px rgba(180, 110, 60, 0.2);
+      }
+
+      .board-grid {
+        display: flex;
+        height: 100%;
+        gap: 4px;
+        contain: layout style;
+      }
+
+      /* Stack Column */
+      .stack-column {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 2px;
+        background: rgba(74, 63, 92, 0.05);
+        padding: 2px;
+        border-radius: 10px;
+        position: relative;
+      }
+
+      /* Engraved clay wells (slots) */
+      .slot {
+        border-radius: 12px;
+        border: 2px dashed rgba(173, 105, 63, 0.4);
+        background: var(--clay-well);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow:
+          inset 0 3px 7px var(--clay-well-inset),
+          inset 0 -2px 5px var(--clay-highlight);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .slot.piece-placed {
+        border-style: solid;
+        border-color: rgba(173, 105, 63, 0.35);
+      }
+
+      .slot.drop-hover {
+        border-color: var(--primary);
+        background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+        box-shadow:
+          inset 0 3px 8px rgba(59, 130, 246, 0.28),
+          0 0 0 3px rgba(59, 130, 246, 0.22);
+        transform: scale(1.02);
+      }
+
+      .slot.placeholder-hint::after {
+        content: attr(data-len);
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #a58a76;
+      }
+
+      /* Candy-clay snake pieces */
+      .snake-piece {
+        display: flex;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: grab;
+        touch-action: none;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        background-image: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.38) 0%,
+          rgba(255, 255, 255, 0) 40%,
+          rgba(0, 0, 0, 0.18) 100%
+        );
+        box-shadow:
+          0 4px 8px rgba(74, 63, 92, 0.25),
+          inset 0 2px 3px rgba(255, 255, 255, 0.55),
+          inset 0 -2px 3px rgba(0, 0, 0, 0.18);
+        transition:
+          transform 0.12s ease,
+          opacity 0.15s ease;
+      }
+
+      .snake-piece:active {
+        cursor: grabbing;
+      }
+
+      .snake-piece.is-dragging {
+        opacity: 0.25;
+      }
+
+      .snake-unit {
+        height: 100%;
+        border-right: 1px solid rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(74, 63, 92, 0.55);
+      }
+
+      .snake-unit:last-child {
+        border-right: none;
+      }
+
+      /* Drag Ghost — GPU-friendly transform positioning */
+      .drag-ghost {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 9999;
+        pointer-events: none;
+        will-change: transform;
+        transition: none !important;
+        box-shadow:
+          0 14px 28px rgba(74, 63, 92, 0.4),
+          inset 0 2px 3px rgba(255, 255, 255, 0.55),
+          inset 0 -2px 3px rgba(0, 0, 0, 0.18) !important;
+      }
+
+      /* ============ START MENU GLASS OVERLAY ============ */
+      .start-menu {
+        position: absolute;
+        inset: 0;
+        z-index: 1500;
+        border-radius: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        padding: 24px;
+        color: var(--clay-ink);
+        animation: menuPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .start-menu.hidden {
+        display: none;
+      }
+
+      @keyframes menuPop {
+        from {
+          transform: scale(0.96);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .menu-title {
+        font-size: 2.1rem;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        color: var(--clay-ink);
+      }
+
+      .menu-subtitle {
+        font-size: 0.9rem;
+        color: var(--clay-ink-soft);
+        margin-top: -10px;
+      }
+
+      .menu-section {
+        display: flex;
+        gap: 16px;
+        margin-top: 4px;
+      }
+
+      .mode-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.7);
+        border-radius: 22px;
+        padding: 20px 36px;
+        cursor: pointer;
+        color: var(--clay-ink);
+        font-family: inherit;
+        box-shadow:
+          0 8px 18px rgba(122, 92, 128, 0.18),
+          inset 0 2px 3px var(--clay-highlight);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease,
+          background 0.15s ease;
+      }
+
+      .mode-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      .mode-card:active {
+        transform: translateY(0px);
+      }
+
+      .mode-card.active {
+        border-color: #9cc0ff;
+        background: rgba(122, 173, 255, 0.35);
+        box-shadow:
+          0 10px 24px rgba(59, 130, 246, 0.4),
+          inset 0 2px 3px var(--clay-highlight);
+      }
+
+      .mode-icon {
+        font-size: 2.6rem;
+        filter: drop-shadow(0 4px 6px rgba(74, 63, 92, 0.25));
+      }
+
+      .mode-name {
+        font-weight: 800;
+        font-size: 1.1rem;
+      }
+
+      .menu-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .menu-row.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+
+      .menu-label {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #5d4d6e;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 4px;
+        background: rgba(74, 63, 92, 0.08);
+        padding: 3px;
+        border-radius: 12px;
+        box-shadow: inset 0 2px 4px rgba(74, 63, 92, 0.15);
+      }
+
+      .btn-option {
+        border: none;
+        background: transparent;
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border-radius: 9px;
+        cursor: pointer;
+        color: var(--clay-ink-soft);
+        font-family: inherit;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+      }
+
+      .btn-option.active {
+        background: #ffffff;
+        color: var(--primary);
+        box-shadow:
+          0 2px 6px rgba(74, 63, 92, 0.18),
+          inset 0 1px 0 var(--clay-highlight);
+      }
+
+      .btn-option:disabled,
+      .btn-group.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+
+      .btn-start {
+        background: linear-gradient(145deg, #7eb0ff 0%, #3b82f6 100%);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        font-size: 1.2rem;
+        font-weight: 900;
+        padding: 14px 52px;
+        border-radius: 40px;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow:
+          0 10px 24px rgba(59, 130, 246, 0.45),
+          inset 0 2px 3px rgba(255, 255, 255, 0.5),
+          inset 0 -3px 6px rgba(30, 64, 175, 0.3);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+        margin-top: 6px;
+      }
+
+      .btn-start:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 14px 30px rgba(59, 130, 246, 0.6),
+          inset 0 2px 3px rgba(255, 255, 255, 0.5),
+          inset 0 -3px 6px rgba(30, 64, 175, 0.3);
+      }
+
+      .btn-start:active {
+        transform: translateY(1px);
+        box-shadow:
+          0 4px 10px rgba(59, 130, 246, 0.4),
+          inset 0 3px 6px rgba(30, 64, 175, 0.35);
+      }
+
+      .menu-hint {
+        font-size: 0.78rem;
+        color: var(--clay-ink-soft);
+        text-align: center;
+        max-width: 460px;
+        margin-top: -6px;
+      }
+
+      /* ============ GLASS COMPLETION MODAL ============ */
+      .modal {
+        position: absolute;
+        inset: 0;
+        border-radius: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--clay-ink);
+        z-index: 1000;
+      }
+
+      .modal.hidden {
+        display: none;
+      }
+
+      .modal h2 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        color: var(--clay-ink);
+      }
+
+      .modal p {
+        color: #6d5f7d;
+      }
+
+      /* ============ GLASS TOAST ============ */
+      .toast {
+        position: fixed;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(74, 63, 92, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 18px rgba(74, 63, 92, 0.3);
+      }
+
+      .toast.show {
+        opacity: 1;
+      }
+
+      /* ============ REDUCED MOTION (low-end friendly) ============ */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <!-- Control Bar -->
+      <div class="header-bar">
+        <div class="title">Snake Stack 🐍</div>
+
+        <div class="controls-group">
+          <span
+            id="turn-indicator"
+            class="turn-indicator"
+            aria-live="polite"
+          ></span>
+          <button
+            type="button"
+            class="clay-btn btn-settings"
+            onclick="openSettings()"
+          >
+            ⚙️ Settings
+          </button>
+          <button type="button" class="btn-reset" onclick="restartGame()">
+            Restart 🔄
+          </button>
+        </div>
+      </div>
+
+      <!-- START MENU GLASS OVERLAY -->
+      <div id="start-menu" class="start-menu glass">
+        <h1 class="menu-title">Choose Game Mode 🎮</h1>
+        <p class="menu-subtitle">Pick your setup and start stacking!</p>
+
+        <div class="menu-section">
+          <button
+            type="button"
+            class="mode-card active"
+            data-players="1"
+            onclick="setPlayers(1)"
+          >
+            <span class="mode-icon">🤖</span>
+            <span class="mode-name">1-Player</span>
+          </button>
+          <button
+            type="button"
+            class="mode-card"
+            data-players="2"
+            onclick="setPlayers(2)"
+          >
+            <span class="mode-icon">👥</span>
+            <span class="mode-name">2-Player</span>
+          </button>
+        </div>
+
+        <div class="menu-row" id="menu-level-row">
+          <span class="menu-label">Bot Level 🎯</span>
+          <div class="btn-group" id="menu-level-selector">
+            <button
+              type="button"
+              class="btn-option"
+              data-level="1"
+              onclick="setLevel(1)"
+            >
+              Easy ⭐
+            </button>
+            <button
+              type="button"
+              class="btn-option active"
+              data-level="2"
+              onclick="setLevel(2)"
+            >
+              Medium ⭐⭐
+            </button>
+            <button
+              type="button"
+              class="btn-option"
+              data-level="3"
+              onclick="setLevel(3)"
+            >
+              Hard ⭐⭐⭐
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-row">
+          <span class="menu-label">Block Order</span>
+          <div class="btn-group" id="menu-mode-selector">
+            <button
+              type="button"
+              class="btn-option"
+              data-mode="random"
+              onclick="setOrderMode('random')"
+            >
+              Random 🔀
+            </button>
+            <button
+              type="button"
+              class="btn-option active"
+              data-mode="ascending"
+              onclick="setOrderMode('ascending')"
+            >
+              Ascending 📈
+            </button>
+            <button
+              type="button"
+              class="btn-option"
+              data-mode="descending"
+              onclick="setOrderMode('descending')"
+            >
+              Descending 📉
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-start" onclick="startGame()">
+          Start Game 🚀
+        </button>
+
+        <p class="menu-hint">
+          Stack snake pieces to complete each column — fill every slot to unlock
+          Snake 10 and win!
+        </p>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="main-layout">
+        <!-- Top Section: Draggable Bank -->
+        <div class="bank-section">
+          <div class="bank-label">
+            🐍 Draggable Snakes — Pick any snake piece to place in the tray
+            below
+          </div>
+          <div id="bank-pieces" class="bank-pieces"></div>
+        </div>
+
+        <!-- Bottom Section: Stack Box -->
+        <div class="board-section">
+          <div id="board-grid" class="board-grid"></div>
+        </div>
+      </div>
+
+      <!-- Celebration Modal (Glass) -->
+      <div id="win-modal" class="modal glass hidden">
+        <h2 id="win-title">Awesome Job! 🏆🐍</h2>
+        <p style="margin-bottom: 16px; font-size: 1.1rem">
+          You completed the full Snake Stack!
+        </p>
+        <button
+          type="button"
+          class="btn-reset"
+          style="padding: 10px 24px; font-size: 1rem; border-radius: 14px"
+          onclick="restartGame()"
+        >
+          Play Again 🚀
+        </button>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <script>
+      "use strict";
+
+      // Rod Colors based on length 1 to 10
+      const ROD_COLORS = {
+        1: "#EF4444", // Red
+        2: "#22C55E", // Green
+        3: "#F472B6", // Pink
+        4: "#EAB308", // Yellow
+        5: "#06B6D4", // Cyan
+        6: "#A855F7", // Purple
+        7: "#64748B", // Slate
+        8: "#854D0E", // Brown
+        9: "#1E293B", // Dark Slate
+        10: "#3B82F6", // Blue
+      };
+
+      const gameState = {
+        mode: "ascending", // 'random', 'ascending', 'descending'
+        players: 1, // 1 or 2
+        currentPlayer: 1, // whose turn it is
+        level: 2, // 1, 2, 3
+        winner: null, // for 2-player win display
+        expanded: false, // whether snake 10 column expanded
+        pieces: [], // list of piece objects { id, length, placed: bool }
+        columns: [], // column target configurations
+        hiddenHints: [], // column indices whose placeholder-hint is hidden
+      };
+
+      /* ============ DOM HELPERS ============ */
+      function el(id) {
+        return document.getElementById(id);
+      }
+
+      function shuffle(arr) {
+        // Unbiased Fisher–Yates shuffle (cheap O(n), no comparator thrash)
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = tmp;
+        }
+        return arr;
+      }
+
+      /* ============ START MENU CONTROLS ============ */
+
+      function showStartMenu() {
+        el("start-menu").classList.remove("hidden");
+        updateTurnIndicator();
+      }
+
+      function openSettings() {
+        showStartMenu();
+      }
+
+      function setPlayers(n) {
+        gameState.players = n;
+        gameState.currentPlayer = 1;
+        document.querySelectorAll(".mode-card").forEach((card) => {
+          card.classList.toggle(
+            "active",
+            parseInt(card.dataset.players, 10) === n,
+          );
+        });
+        updateTurnIndicator();
+      }
+
+      function setOrderMode(orderMode) {
+        gameState.mode = orderMode;
+        document
+          .querySelectorAll("#menu-mode-selector .btn-option")
+          .forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.mode === orderMode);
+          });
+      }
+
+      function setLevel(lvl) {
+        if (gameState.mode === "random") return;
+        gameState.level = lvl;
+        document
+          .querySelectorAll("#menu-level-selector .btn-option")
+          .forEach((btn) => {
+            btn.classList.toggle(
+              "active",
+              parseInt(btn.dataset.level, 10) === lvl,
+            );
+          });
+      }
+
+      function startGame() {
+        gameState.currentPlayer = 1;
+        gameState.winner = null;
+        el("start-menu").classList.add("hidden");
+        el("win-modal").classList.add("hidden");
+        initGame();
+      }
+
+      function restartGame() {
+        gameState.currentPlayer = 1;
+        gameState.winner = null;
+        el("win-modal").classList.add("hidden");
+        initGame();
+      }
+
+      function updateTurnIndicator() {
+        const indicator = el("turn-indicator");
+        if (gameState.players === 2 && !gameState.expanded) {
+          indicator.textContent =
+            gameState.currentPlayer === 1 ? "🤖 P1's Turn" : "👥 P2's Turn";
+          indicator.style.display = "inline-block";
+        } else {
+          indicator.style.display = "none";
+        }
+      }
+
+      /* ============ GAME LOGIC ============ */
+
+      let toastTimer = null;
+
+      function showToast(msg) {
+        const t = el("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        // Clear any pending timer so rapid toasts never stack timers
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove("show"), 1500);
+      }
+
+      function initGame() {
+        el("win-modal").classList.add("hidden");
+        gameState.expanded = false;
+        gameState.winner = null;
+
+        // 1. Generate column bottom length sequence for 9 columns
+        const bottomOrder = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        if (gameState.mode === "descending") {
+          bottomOrder.reverse();
+        } else if (gameState.mode === "random") {
+          shuffle(bottomOrder);
+        }
+
+        // Configure 9 columns (each has bottom target length and top complement target length)
+        gameState.columns = bottomOrder.map((bottomLen) => ({
+          bottomLen,
+          topLen: 10 - bottomLen,
+          bottomPiece: null,
+          topPiece: null,
+        }));
+
+        // 2. Initialize pieces array (18 initial pieces: two of each 1..9)
+        const pieceList = [];
+        let idCounter = 1;
+        for (let len = 1; len <= 9; len++) {
+          pieceList.push({ id: idCounter++, length: len });
+          pieceList.push({ id: idCounter++, length: len });
+        }
+
+        // Shuffle draggable pieces bank
+        shuffle(pieceList);
+        gameState.pieces = pieceList;
+
+        // 3. Hide random bottom placeholder-hints according to Level settings
+        //    (Level 1: 1 hidden, Level 2: 3 hidden, Level 3: 6 hidden)
+        let hiddenHintCount = 6;
+        if (gameState.level === 1) {
+          hiddenHintCount = 1;
+        } else if (gameState.level === 2) {
+          hiddenHintCount = 3;
+        }
+
+        gameState.hiddenHints = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(
+          0,
+          hiddenHintCount,
+        );
+
+        updateTurnIndicator();
+        renderBoard();
+        renderBank();
+      }
+
+      function renderBank() {
+        const bankEl = el("bank-pieces");
+        bankEl.innerHTML = "";
+
+        const available = gameState.pieces.filter((p) => !p.placed);
+        available.forEach((p) => {
+          const pieceEl = createSnakePieceElement(p);
+          p.el = pieceEl; // keep a ref for cheap targeted removal later
+          bankEl.appendChild(pieceEl);
+        });
+      }
+
+      function renderBoard() {
+        const boardGrid = el("board-grid");
+        boardGrid.innerHTML = "";
+
+        gameState.columns.forEach((col, colIdx) => {
+          const colEl = document.createElement("div");
+          colEl.className = "stack-column";
+          colEl.dataset.col = colIdx;
+
+          // Compute column width relative to unit scale
+          colEl.style.width = "calc(6.5vw)";
+
+          // Top slot
+          const topSlot = document.createElement("div");
+          topSlot.className = "slot top-slot";
+          topSlot.dataset.col = colIdx;
+          topSlot.dataset.pos = "top";
+          topSlot.dataset.reqLen = col.topLen;
+          topSlot.style.height = `calc(${col.topLen} * 3.8vh)`;
+
+          if (col.topPiece) {
+            topSlot.appendChild(createSnakePieceElement(col.topPiece, true));
+          }
+
+          // Bottom slot
+          const bottomSlot = document.createElement("div");
+          bottomSlot.className = "slot bottom-slot";
+          bottomSlot.dataset.col = colIdx;
+          bottomSlot.dataset.pos = "bottom";
+          bottomSlot.dataset.reqLen = col.bottomLen;
+          bottomSlot.style.height = `calc(${col.bottomLen} * 3.8vh)`;
+
+          if (col.bottomPiece) {
+            bottomSlot.appendChild(
+              createSnakePieceElement(col.bottomPiece, true),
+            );
+          } else if (!gameState.hiddenHints.includes(colIdx)) {
+            bottomSlot.classList.add("placeholder-hint");
+            bottomSlot.dataset.len = col.bottomLen;
+          }
+
+          if (col.isSnake10Col) {
+            // Full height 10 slot
+            colEl.innerHTML = "";
+            const slot10 = document.createElement("div");
+            slot10.className = "slot slot-10";
+            slot10.dataset.col = colIdx;
+            slot10.dataset.pos = "full10";
+            slot10.dataset.reqLen = 10;
+            slot10.style.height = "calc(10 * 3.8vh)";
+
+            if (col.bottomPiece) {
+              slot10.appendChild(
+                createSnakePieceElement(col.bottomPiece, true),
+              );
+            } else {
+              slot10.classList.add("placeholder-hint");
+              slot10.dataset.len = 10;
+            }
+            colEl.appendChild(slot10);
+          } else {
+            colEl.appendChild(topSlot);
+            colEl.appendChild(bottomSlot);
+          }
+
+          boardGrid.appendChild(colEl);
+        });
+      }
+
+      function createSnakePieceElement(pieceObj, isFixed = false) {
+        const pieceEl = document.createElement("div");
+        pieceEl.className = "snake-piece";
+        pieceEl.dataset.id = pieceObj.id;
+        pieceEl.dataset.length = pieceObj.length;
+
+        pieceEl.style.backgroundColor = ROD_COLORS[pieceObj.length];
+        pieceEl.style.width = `calc(${pieceObj.length} * 1.8vw)`;
+        pieceEl.style.height = "3.6vh";
+
+        if (isFixed) {
+          pieceEl.style.width = "100%";
+          pieceEl.style.height = "100%";
+          pieceEl.style.cursor = "default";
+          pieceEl.style.borderRadius = "7px";
+          if (pieceObj.length >= 5) {
+            pieceEl.style.flexDirection = "row";
+          }
+        }
+
+        for (let i = 0; i < pieceObj.length; i++) {
+          const unit = document.createElement("div");
+          unit.className = "snake-unit";
+          unit.style.flex = "1";
+          if (i === 0 || i === pieceObj.length - 1) {
+            unit.textContent = pieceObj.length;
+          }
+          pieceEl.appendChild(unit);
+        }
+
+        if (!isFixed) {
+          pieceEl.addEventListener("pointerdown", (e) =>
+            startDrag(e, pieceObj, pieceEl),
+          );
+        }
+
+        return pieceEl;
+      }
+
+      /* ============ DRAG ENGINE (rAF-throttled, pointer capture) ============ */
+      function startDrag(e, pieceObj, sourceEl) {
+        e.preventDefault();
+
+        const rect = sourceEl.getBoundingClientRect();
+        const offX = rect.width / 2;
+        const offY = rect.height / 2;
+
+        const ghost = sourceEl.cloneNode(true);
+        ghost.classList.add("drag-ghost");
+        document.body.appendChild(ghost);
+
+        sourceEl.classList.add("is-dragging");
+
+        let lastX = e.clientX;
+        let lastY = e.clientY;
+        let rafId = null;
+        let activeSlot = null;
+
+        // Only runs once per frame — one hit-test per display refresh, max.
+        function updateGhost() {
+          rafId = null;
+          ghost.style.transform = `translate3d(${lastX - offX}px, ${lastY - offY}px, 0) scale(1.06)`;
+          const elUnder = document.elementFromPoint(lastX, lastY);
+          const slot = elUnder ? elUnder.closest(".slot") : null;
+          if (slot !== activeSlot) {
+            if (activeSlot) activeSlot.classList.remove("drop-hover");
+            activeSlot = slot;
+            if (activeSlot) activeSlot.classList.add("drop-hover");
+          }
+        }
+
+        function onMove(ev) {
+          lastX = ev.clientX;
+          lastY = ev.clientY;
+          if (!rafId) rafId = requestAnimationFrame(updateGhost);
+        }
+
+        function finish(ev, canceled) {
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          if (ev && typeof ev.clientX === "number") {
+            lastX = ev.clientX;
+            lastY = ev.clientY;
+          }
+          // Final hit-test in case the pointer never moved (tap-to-place)
+          ghost.style.transform = `translate3d(${lastX - offX}px, ${lastY - offY}px, 0) scale(1.06)`;
+          const elUnder = document.elementFromPoint(lastX, lastY);
+          const slot = elUnder ? elUnder.closest(".slot") : null;
+
+          if (activeSlot) activeSlot.classList.remove("drop-hover");
+          ghost.remove();
+          sourceEl.classList.remove("is-dragging");
+
+          if (!canceled && slot) {
+            const reqLen = parseInt(slot.dataset.reqLen, 10);
+            const colIdx = parseInt(slot.dataset.col, 10);
+            const pos = slot.dataset.pos;
+
+            if (reqLen === pieceObj.length) {
+              // Valid drop → TARGETED DOM update (no full re-render, no layout thrash)
+              const col = gameState.columns[colIdx];
+              if (pos === "bottom" || pos === "full10")
+                col.bottomPiece = pieceObj;
+              else if (pos === "top") col.topPiece = pieceObj;
+
+              pieceObj.placed = true;
+
+              sourceEl.remove();
+              slot.classList.remove("placeholder-hint", "drop-hover");
+              delete slot.dataset.len;
+              slot.classList.add("piece-placed");
+              slot.appendChild(createSnakePieceElement(pieceObj, true));
+
+              showToast("✅ Great match!");
+
+              // 2-Player turn switching after a successful placement
+              if (gameState.players === 2) {
+                gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
+                updateTurnIndicator();
+              }
+
+              checkProgress();
+            } else {
+              showToast(`❌ Need length ${reqLen} here!`);
+            }
+          }
+        }
+
+        const onUp = (ev) => finish(ev, false);
+        const onCancel = (ev) => finish(ev, true);
+
+        // Pointer capture keeps move/up events flowing even off-element — reliable on touch.
+        try {
+          sourceEl.setPointerCapture(e.pointerId);
+        } catch (err) {
+          /* older browsers: fall back to element listeners */
+        }
+
+        sourceEl.addEventListener("pointermove", onMove);
+        sourceEl.addEventListener("pointerup", onUp);
+        sourceEl.addEventListener("pointercancel", onCancel);
+      }
+
+      /* ============ CHECK GAME COMPLETION & SNAKE 10 EXPANSION ============ */
+      function checkProgress() {
+        const initialFilled = gameState.columns
+          .filter((c) => !c.isSnake10Col)
+          .every((c) => c.bottomPiece && c.topPiece);
+
+        if (initialFilled && !gameState.expanded) {
+          gameState.expanded = true;
+          updateTurnIndicator();
+          setTimeout(expandBoxForSnake10, 600);
+          return;
+        }
+
+        if (gameState.expanded) {
+          const snake10Col = gameState.columns.find((c) => c.isSnake10Col);
+          if (snake10Col && snake10Col.bottomPiece) {
+            // Determine winner (2P: the other player just made the final move)
+            if (gameState.players === 2) {
+              const winner = gameState.currentPlayer === 1 ? 2 : 1;
+              gameState.winner = winner;
+              el("win-title").textContent = `Player ${winner} Wins! 🏆🎉`;
+            } else {
+              el("win-title").textContent = `Awesome Job! 🏆🐍`;
+            }
+            setTimeout(() => {
+              el("win-modal").classList.remove("hidden");
+            }, 500);
+          }
+        }
+      }
+
+      function expandBoxForSnake10() {
+        showToast("🌟 Box Expands! Here comes Snake 10!");
+
+        // Create Snake 10 piece and add to bank
+        gameState.pieces.push({ id: 99, length: 10, placed: false });
+
+        const newCol = {
+          isSnake10Col: true,
+          bottomLen: 10,
+          topLen: 0,
+          bottomPiece: null,
+          topPiece: null,
+        };
+
+        // Determine expansion position based on mode
+        if (gameState.mode === "ascending") {
+          gameState.columns.push(newCol); // On the Right
+        } else if (gameState.mode === "descending") {
+          gameState.columns.unshift(newCol); // On the Left
+        } else {
+          // Random mode: randomly left or right
+          if (Math.random() > 0.5) gameState.columns.push(newCol);
+          else gameState.columns.unshift(newCol);
+        }
+
+        renderBoard();
+        renderBank();
+      }
+
+      // Initialize on load: show start menu with defaults
+      showStartMenu();
+      setPlayers(1);
+      setOrderMode("ascending");
+      setLevel(2);
+    </script>
+  </body>
+</html>
