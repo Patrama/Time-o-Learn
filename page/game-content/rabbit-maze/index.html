@@ -1,0 +1,1116 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Rabbit Maze Express 🐇🥕</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        font-family: "Baloo 2", "Comic Sans MS", "Chalkboard SE", sans-serif;
+      }
+
+      :root {
+        /* ---------- Clay palette (design tokens) ---------- */
+        --clay-bg-1: #fdeed8;
+        --clay-bg-2: #f8dfc4;
+        --clay-bg-3: #f2d2c4;
+        --clay-surface: #fff7ee;
+        --clay-surface-2: #fcebda;
+        --clay-mint: #bfe8cd;
+        --clay-mint-deep: #93c9a9;
+        --clay-sky: #cfe6f7;
+        --clay-sky-deep: #9dbeda;
+        --clay-peach: #ffcfb0;
+        --clay-peach-deep: #db9f80;
+        --clay-coral: #ff9e94;
+        --clay-coral-deep: #d97a70;
+        --clay-lilac: #e3d0f0;
+        --clay-lilac-deep: #b394ca;
+        --clay-butter: #ffdf8e;
+        --clay-butter-deep: #e0b554;
+        --clay-terracotta: #c4653f;
+        --clay-text: #6b5040;
+        --clay-text-soft: #8a6d5a;
+        --clay-green-text: #3f6b50;
+        --clay-brown-text: #7a5520;
+        --clay-canvas: #fdf6ec;
+        --clay-wall: #8a6a50;
+        --clay-guide: #5cb98a;
+        --clay-bump: #ff9e94;
+
+        /* Radius scale */
+        --radius-sm: 16px;
+        --radius-md: 22px;
+        --radius-lg: 30px;
+        --radius-pill: 999px;
+
+        /* Shared inner-volume shading for the puffy clay look */
+        --clay-highlight: inset 0 2px 3px rgba(255, 255, 255, 0.85);
+        --clay-shade: inset 0 -3px 5px rgba(0, 0, 0, 0.07);
+        --clay-pressed: inset 0 4px 8px rgba(0, 0, 0, 0.12);
+      }
+
+      body {
+        margin: 0;
+        padding: 14px;
+        background: linear-gradient(
+          160deg,
+          var(--clay-bg-1) 0%,
+          var(--clay-bg-2) 50%,
+          var(--clay-bg-3) 100%
+        );
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      h1 {
+        color: var(--clay-terracotta);
+        margin: 0 0 10px 0;
+        font-size: 2.2rem;
+        font-weight: 800;
+        text-shadow: 3px 3px 0px #fff;
+        text-align: center;
+      }
+
+      .controls-panel {
+        background: var(--clay-surface);
+        padding: 12px 20px;
+        border-radius: var(--radius-lg);
+        box-shadow:
+          0 10px 0 #e8c9a8,
+          0 16px 26px rgba(160, 110, 70, 0.2),
+          var(--clay-highlight),
+          var(--clay-shade);
+        display: flex;
+        flex-direction: row;
+        gap: 14px;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+        max-width: 460px;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .setting-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .setting-group label {
+        font-weight: 800;
+        font-size: 0.95rem;
+        color: var(--clay-text);
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        background: var(--clay-surface-2);
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 8px 14px;
+        font-weight: 800;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        line-height: 1;
+        color: var(--clay-text);
+        box-shadow:
+          0 5px 0 #d8b794,
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      .btn.active {
+        background: var(--clay-butter);
+        box-shadow:
+          0 2px 0 var(--clay-butter-deep),
+          var(--clay-pressed);
+        transform: translateY(3px) scale(1.08);
+      }
+
+      .btn:active {
+        transform: translateY(2px) scale(0.97);
+        box-shadow:
+          0 3px 0 #d8b794,
+          inset 0 3px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .sound-btn {
+        background: var(--clay-sky);
+        border: none;
+        border-radius: 50%;
+        width: 46px;
+        height: 46px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow:
+          0 5px 0 var(--clay-sky-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      .sound-btn:active {
+        transform: translateY(2px);
+        box-shadow:
+          0 3px 0 var(--clay-sky-deep),
+          inset 0 3px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .stats-bar {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        max-width: 460px;
+        background: var(--clay-mint);
+        color: var(--clay-green-text);
+        padding: 12px 18px;
+        border-radius: var(--radius-md);
+        font-size: 1.3rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        box-shadow:
+          0 8px 0 var(--clay-mint-deep),
+          0 12px 20px rgba(80, 130, 100, 0.22),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      #carrot-count {
+        transition: transform 0.2s ease;
+        display: inline-block;
+      }
+      #carrot-count.pop {
+        transform: scale(1.4);
+      }
+
+      #game-container {
+        position: relative;
+        background: var(--clay-surface);
+        border-radius: var(--radius-lg);
+        padding: 12px;
+        box-shadow:
+          0 12px 0 #e0c4a4,
+          0 18px 28px rgba(150, 100, 60, 0.24),
+          var(--clay-highlight),
+          var(--clay-shade);
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+        border-radius: var(--radius-md);
+        background: var(--clay-canvas);
+        touch-action: none;
+        box-shadow: inset 0 4px 10px rgba(140, 95, 55, 0.14);
+      }
+
+      .toast {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translate(-50%, -30px);
+        background: var(--clay-butter);
+        border: none;
+        border-radius: var(--radius-pill);
+        padding: 8px 22px;
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: var(--clay-brown-text);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+        z-index: 5;
+        box-shadow:
+          0 5px 0 var(--clay-butter-deep),
+          0 10px 18px rgba(150, 110, 40, 0.28),
+          var(--clay-highlight);
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0px);
+      }
+
+      .dpad-container {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(3, 76px);
+        grid-template-rows: repeat(2, 76px);
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .arrow-btn {
+        background: var(--clay-coral);
+        border: none;
+        border-radius: 20px;
+        font-size: 2.2rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow:
+          0 7px 0 var(--clay-coral-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+        transition:
+          transform 0.08s,
+          box-shadow 0.08s;
+      }
+      .arrow-btn:active {
+        transform: translateY(4px) scale(0.95);
+        box-shadow:
+          0 3px 0 var(--clay-coral-deep),
+          var(--clay-pressed);
+      }
+
+      .arrow-btn.up {
+        grid-column: 2;
+        grid-row: 1;
+        background: var(--clay-sky);
+        box-shadow:
+          0 7px 0 var(--clay-sky-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .arrow-btn.up:active {
+        box-shadow:
+          0 3px 0 var(--clay-sky-deep),
+          var(--clay-pressed);
+      }
+
+      .arrow-btn.left {
+        grid-column: 1;
+        grid-row: 2;
+        background: var(--clay-mint);
+        box-shadow:
+          0 7px 0 var(--clay-mint-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .arrow-btn.left:active {
+        box-shadow:
+          0 3px 0 var(--clay-mint-deep),
+          var(--clay-pressed);
+      }
+
+      .arrow-btn.down {
+        grid-column: 2;
+        grid-row: 2;
+        background: var(--clay-peach);
+        box-shadow:
+          0 7px 0 var(--clay-peach-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .arrow-btn.down:active {
+        box-shadow:
+          0 3px 0 var(--clay-peach-deep),
+          var(--clay-pressed);
+      }
+
+      .arrow-btn.right {
+        grid-column: 3;
+        grid-row: 2;
+        background: var(--clay-lilac);
+        box-shadow:
+          0 7px 0 var(--clay-lilac-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .arrow-btn.right:active {
+        box-shadow:
+          0 3px 0 var(--clay-lilac-deep),
+          var(--clay-pressed);
+      }
+
+      .modal {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 246, 235, 0.96);
+        border-radius: 26px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        text-align: center;
+        box-shadow:
+          inset 0 3px 6px rgba(255, 255, 255, 0.9),
+          inset 0 -5px 10px rgba(160, 100, 60, 0.08);
+      }
+      .modal .big-emoji {
+        font-size: 4rem;
+        margin-bottom: 6px;
+        animation: bounce 0.6s ease infinite alternate;
+      }
+      @keyframes bounce {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-14px);
+        }
+      }
+      .modal h2 {
+        font-size: 2.1rem;
+        color: var(--clay-terracotta);
+        margin: 0 0 10px 0;
+      }
+      .modal p {
+        font-size: 1.15rem;
+        color: var(--clay-text-soft);
+        margin-top: -6px;
+      }
+      .modal button {
+        background: var(--clay-mint);
+        border: none;
+        padding: 12px 28px;
+        font-size: 1.3rem;
+        border-radius: var(--radius-pill);
+        font-weight: 800;
+        color: var(--clay-green-text);
+        cursor: pointer;
+        box-shadow:
+          0 6px 0 var(--clay-mint-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .modal button:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 3px 0 var(--clay-mint-deep),
+          var(--clay-pressed);
+      }
+
+      .confetti-piece {
+        position: absolute;
+        top: -10px;
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        pointer-events: none;
+        animation: fall linear forwards;
+        z-index: 11;
+      }
+      @keyframes fall {
+        to {
+          transform: translateY(420px) rotate(360deg);
+          opacity: 0.2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Rabbit Maze Express 🐇</h1>
+
+    <div class="controls-panel">
+      <div class="setting-group">
+        <label>Pick a Map</label>
+        <div class="btn-group" id="level-selector">
+          <button class="btn active" data-level="1">🌱</button>
+          <button class="btn" data-level="2">🌳</button>
+          <button class="btn" data-level="3">🏔️</button>
+        </div>
+      </div>
+      <button class="sound-btn" id="sound-toggle" title="Toggle sound">
+        🔊
+      </button>
+    </div>
+
+    <div class="stats-bar">
+      <span id="carrot-count">🥕 0 / 10</span>
+      <span id="grid-info">🗺️ 6x6 Map</span>
+    </div>
+
+    <div id="game-container">
+      <canvas id="mazeCanvas" width="360" height="360"></canvas>
+      <div class="toast" id="toast">Yay!</div>
+      <div class="modal" id="winModal">
+        <div class="big-emoji">🎉</div>
+        <h2>YOU DID IT!</h2>
+        <p style="font-size: 1.15rem; color: #8a6d5a; margin-top: -6px">
+          The bunny is home safe! 🏡💚
+        </p>
+        <button onclick="resetGame()">Play Again 🔄</button>
+      </div>
+    </div>
+
+    <div class="dpad-container">
+      <button class="arrow-btn up" data-dx="0" data-dy="-1">⬆️</button>
+      <button class="arrow-btn left" data-dx="-1" data-dy="0">⬅️</button>
+      <button class="arrow-btn down" data-dx="0" data-dy="1">⬇️</button>
+      <button class="arrow-btn right" data-dx="1" data-dy="0">➡️</button>
+    </div>
+
+    <script>
+      (function () {
+        const canvas = document.getElementById("mazeCanvas");
+        const ctx = canvas.getContext("2d");
+        const winModal = document.getElementById("winModal");
+        const gameContainer = document.getElementById("game-container");
+        const toast = document.getElementById("toast");
+        const carrotCountEl = document.getElementById("carrot-count");
+        const soundToggleBtn = document.getElementById("sound-toggle");
+
+        // ---------- Sound (Web Audio, no external files needed) ----------
+        let soundOn = true;
+        let audioCtx = null;
+
+        function ensureAudio() {
+          if (!audioCtx) {
+            try {
+              audioCtx = new (
+                window.AudioContext || window.webkitAudioContext
+              )();
+            } catch (e) {
+              audioCtx = null;
+            }
+          }
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        }
+
+        function beep(freq, duration, type, delay, gainPeak) {
+          if (!soundOn || !audioCtx) return;
+          const t0 = audioCtx.currentTime + (delay || 0);
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || "sine";
+          osc.frequency.setValueAtTime(freq, t0);
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(gainPeak || 0.18, t0 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t0);
+          osc.stop(t0 + duration + 0.05);
+        }
+
+        function playHop() {
+          beep(440, 0.08, "square", 0, 0.09);
+        }
+        function playCarrot() {
+          beep(660, 0.12, "sine", 0, 0.18);
+          beep(880, 0.14, "sine", 0.08, 0.18);
+          beep(1100, 0.16, "sine", 0.16, 0.18);
+        }
+        function playBump() {
+          beep(180, 0.1, "sawtooth", 0, 0.12);
+        }
+        function playWin() {
+          [523, 659, 784, 1047].forEach((f, i) =>
+            beep(f, 0.22, "triangle", i * 0.12, 0.2),
+          );
+        }
+
+        soundToggleBtn.addEventListener("click", () => {
+          soundOn = !soundOn;
+          soundToggleBtn.textContent = soundOn ? "🔊" : "🔇";
+          ensureAudio();
+        });
+
+        // ---------- Level configuration ----------
+        // Smaller boards, gentler pacing, and a generous "guiding sparkle path"
+        // so a toddler rarely feels lost or stuck.
+        const levelConfig = {
+          1: {
+            gridSize: 6,
+            carrots: 3,
+            linger: 6.0,
+            speed: 1.0,
+            label: "6x6",
+          },
+          2: {
+            gridSize: 9,
+            carrots: 4,
+            linger: 4.5,
+            speed: 0.85,
+            label: "9x9",
+          },
+          3: {
+            gridSize: 12,
+            carrots: 5,
+            linger: 3.5,
+            speed: 0.7,
+            label: "12x12",
+          },
+        };
+
+        let currentLevel = 1;
+        let gridSize = 6;
+        let cellSize = 360 / gridSize;
+
+        let rabbit = { x: 0, y: 0 };
+        let rabbitDisplay = { x: 0, y: 0 }; // for smooth hop animation
+        let hopAnim = null;
+
+        let goal = { x: gridSize - 1, y: gridSize - 1 };
+        let carrot = { x: 0, y: 0 };
+        let carrotBounce = 0;
+
+        let carrotsCollected = 0;
+        let targetCarrots = 3;
+        let guideLingerTime = 6;
+        let guideBuildSpeed = 1.0;
+
+        let maze = [];
+        let guidePath = [];
+        let guideProgress = 0;
+        let guideTimer = null;
+        let guideAlpha = 1;
+
+        let bumpFlash = 0; // brief red flash when hitting a wall, so toddlers get gentle feedback
+        let rafRunning = false;
+
+        const encouragements = [
+          "Yay!",
+          "Great hop!",
+          "Woohoo!",
+          "Nice one!",
+          "Go bunny go!",
+          "Yummy!",
+        ];
+
+        class Cell {
+          constructor(r, c) {
+            this.r = r;
+            this.c = c;
+            this.walls = { top: true, right: true, bottom: true, left: true };
+            this.visited = false;
+          }
+        }
+
+        function initGame() {
+          const config = levelConfig[currentLevel];
+          gridSize = config.gridSize;
+          cellSize = 360 / gridSize;
+          targetCarrots = config.carrots;
+          guideLingerTime = config.linger;
+          guideBuildSpeed = config.speed;
+
+          rabbit = { x: 0, y: 0 };
+          rabbitDisplay = { x: 0, y: 0 };
+          goal = { x: gridSize - 1, y: gridSize - 1 };
+          carrotsCollected = 0;
+
+          document.getElementById("grid-info").textContent =
+            `🗺️ ${config.label} Map`;
+          updateStats();
+          winModal.style.display = "none";
+          stopGuideLine();
+
+          generateMaze();
+          spawnCarrot();
+          startLoop();
+        }
+
+        function generateMaze() {
+          maze = [];
+          for (let r = 0; r < gridSize; r++) {
+            let row = [];
+            for (let c = 0; c < gridSize; c++) row.push(new Cell(r, c));
+            maze.push(row);
+          }
+
+          let stack = [];
+          let current = maze[0][0];
+          current.visited = true;
+
+          while (true) {
+            let unvisitedNeighbors = getNeighbors(current);
+            if (unvisitedNeighbors.length > 0) {
+              let next =
+                unvisitedNeighbors[
+                  Math.floor(Math.random() * unvisitedNeighbors.length)
+                ];
+              removeWalls(current, next);
+              stack.push(current);
+              current = next;
+              current.visited = true;
+            } else if (stack.length > 0) {
+              current = stack.pop();
+            } else {
+              break;
+            }
+          }
+        }
+
+        function getNeighbors(cell) {
+          let neighbors = [];
+          let { r, c } = cell;
+          if (r > 0 && !maze[r - 1][c].visited) neighbors.push(maze[r - 1][c]);
+          if (c < gridSize - 1 && !maze[r][c + 1].visited)
+            neighbors.push(maze[r][c + 1]);
+          if (r < gridSize - 1 && !maze[r + 1][c].visited)
+            neighbors.push(maze[r + 1][c]);
+          if (c > 0 && !maze[r][c - 1].visited) neighbors.push(maze[r][c - 1]);
+          return neighbors;
+        }
+
+        function removeWalls(a, b) {
+          let dr = a.r - b.r;
+          let dc = a.c - b.c;
+          if (dr === 1) {
+            a.walls.top = false;
+            b.walls.bottom = false;
+          } else if (dr === -1) {
+            a.walls.bottom = false;
+            b.walls.top = false;
+          }
+          if (dc === 1) {
+            a.walls.left = false;
+            b.walls.right = false;
+          } else if (dc === -1) {
+            a.walls.right = false;
+            b.walls.left = false;
+          }
+        }
+
+        function spawnCarrot() {
+          if (carrotsCollected >= targetCarrots) {
+            carrot = { x: -1, y: -1 };
+            return;
+          }
+          let valid = false;
+          while (!valid) {
+            let cx = Math.floor(Math.random() * gridSize);
+            let cy = Math.floor(Math.random() * gridSize);
+            if (
+              (cx !== rabbit.x || cy !== rabbit.y) &&
+              (cx !== goal.x || cy !== goal.y)
+            ) {
+              carrot = { x: cx, y: cy };
+              valid = true;
+            }
+          }
+        }
+
+        function showToast(text) {
+          toast.textContent = text;
+          toast.classList.add("show");
+          clearTimeout(showToast._t);
+          showToast._t = setTimeout(() => toast.classList.remove("show"), 900);
+        }
+
+        function moveRabbit(dx, dy) {
+          ensureAudio();
+          let currentCell = maze[rabbit.y][rabbit.x];
+          let nx = rabbit.x + dx;
+          let ny = rabbit.y + dy;
+
+          let blocked = false;
+          if (nx < 0 || nx >= gridSize || ny < 0 || ny >= gridSize)
+            blocked = true;
+          if (dy === -1 && currentCell.walls.top) blocked = true;
+          if (dx === 1 && currentCell.walls.right) blocked = true;
+          if (dy === 1 && currentCell.walls.bottom) blocked = true;
+          if (dx === -1 && currentCell.walls.left) blocked = true;
+
+          if (blocked) {
+            playBump();
+            bumpFlash = 1;
+            return;
+          }
+
+          rabbit.x = nx;
+          rabbit.y = ny;
+          hopAnim = { t: 0 };
+          playHop();
+
+          if (rabbit.x === carrot.x && rabbit.y === carrot.y) {
+            carrotsCollected++;
+            updateStats();
+            playCarrot();
+            carrotBounce = 1;
+            showToast(
+              "🥕 " +
+                encouragements[
+                  Math.floor(Math.random() * encouragements.length)
+                ],
+            );
+            triggerGuidingLine();
+            spawnCarrot();
+          }
+
+          if (rabbit.x === goal.x && rabbit.y === goal.y) {
+            setTimeout(() => {
+              playWin();
+              launchConfetti();
+              winModal.style.display = "flex";
+            }, 150);
+          }
+        }
+
+        function findShortestPath(start, target) {
+          let queue = [[start]];
+          let visited = new Set();
+          visited.add(`${start.x},${start.y}`);
+
+          while (queue.length > 0) {
+            let path = queue.shift();
+            let curr = path[path.length - 1];
+            if (curr.x === target.x && curr.y === target.y) return path;
+
+            let cell = maze[curr.y][curr.x];
+            let moves = [
+              { x: curr.x, y: curr.y - 1, wall: cell.walls.top },
+              { x: curr.x + 1, y: curr.y, wall: cell.walls.right },
+              { x: curr.x, y: curr.y + 1, wall: cell.walls.bottom },
+              { x: curr.x - 1, y: curr.y, wall: cell.walls.left },
+            ];
+            for (let m of moves) {
+              let key = `${m.x},${m.y}`;
+              if (
+                !m.wall &&
+                m.x >= 0 &&
+                m.x < gridSize &&
+                m.y >= 0 &&
+                m.y < gridSize &&
+                !visited.has(key)
+              ) {
+                visited.add(key);
+                queue.push([...path, { x: m.x, y: m.y }]);
+              }
+            }
+          }
+          return [];
+        }
+
+        function triggerGuidingLine() {
+          stopGuideLine();
+          guidePath = findShortestPath(rabbit, goal);
+          if (guidePath.length === 0) return;
+
+          guideProgress = 0;
+          guideAlpha = 1;
+
+          const maxAllowedNodes = Math.ceil(guidePath.length * guideBuildSpeed);
+          const buildDuration = 900;
+          const stepInterval = 25;
+          const totalSteps = buildDuration / stepInterval;
+          const increment = maxAllowedNodes / totalSteps;
+
+          let currentStep = 0;
+          guideTimer = setInterval(() => {
+            currentStep++;
+            guideProgress += increment;
+            if (guideProgress >= maxAllowedNodes || currentStep >= totalSteps) {
+              guideProgress = maxAllowedNodes;
+              clearInterval(guideTimer);
+              guideTimer = null;
+              setTimeout(() => fadeGuideLine(), guideLingerTime * 1000);
+            }
+          }, stepInterval);
+        }
+
+        function fadeGuideLine() {
+          let fadeInterval = setInterval(() => {
+            guideAlpha -= 0.08;
+            if (guideAlpha <= 0) {
+              guideAlpha = 0;
+              clearInterval(fadeInterval);
+              stopGuideLine();
+            }
+          }, 50);
+        }
+
+        function stopGuideLine() {
+          if (guideTimer) clearInterval(guideTimer);
+          guidePath = [];
+          guideProgress = 0;
+          guideAlpha = 1;
+        }
+
+        function updateStats() {
+          carrotCountEl.textContent = `🥕 ${carrotsCollected} / ${targetCarrots}`;
+          carrotCountEl.classList.remove("pop");
+          void carrotCountEl.offsetWidth; // restart animation
+          carrotCountEl.classList.add("pop");
+        }
+
+        // ---------- Confetti ----------
+        function launchConfetti() {
+          // Clay palette (mirrors the CSS clay tokens)
+          const colors = [
+            "#ff9e94",
+            "#ffdf8e",
+            "#bfe8cd",
+            "#cfe6f7",
+            "#e3d0f0",
+            "#ffcfb0",
+            "#f5b464",
+          ];
+          for (let i = 0; i < 40; i++) {
+            const piece = document.createElement("div");
+            piece.className = "confetti-piece";
+            piece.style.left = Math.random() * 100 + "%";
+            piece.style.background =
+              colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDuration = 1.2 + Math.random() * 1.2 + "s";
+            piece.style.animationDelay = Math.random() * 0.4 + "s";
+            gameContainer.appendChild(piece);
+            setTimeout(() => piece.remove(), 3000);
+          }
+        }
+
+        // ---------- Render loop (smooth hop + gentle bump flash) ----------
+        function startLoop() {
+          if (rafRunning) return;
+          rafRunning = true;
+          requestAnimationFrame(loop);
+        }
+
+        function loop() {
+          // Smoothly interpolate rabbit display position toward target for a friendly hop
+          rabbitDisplay.x += (rabbit.x - rabbitDisplay.x) * 0.35;
+          rabbitDisplay.y += (rabbit.y - rabbitDisplay.y) * 0.35;
+          if (Math.abs(rabbit.x - rabbitDisplay.x) < 0.01)
+            rabbitDisplay.x = rabbit.x;
+          if (Math.abs(rabbit.y - rabbitDisplay.y) < 0.01)
+            rabbitDisplay.y = rabbit.y;
+
+          if (hopAnim) {
+            hopAnim.t += 0.15;
+            if (hopAnim.t >= 1) hopAnim = null;
+          }
+          if (carrotBounce > 0) carrotBounce = Math.max(0, carrotBounce - 0.06);
+          if (bumpFlash > 0) bumpFlash = Math.max(0, bumpFlash - 0.08);
+
+          draw();
+          requestAnimationFrame(loop);
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // gentle bump flash background
+          if (bumpFlash > 0) {
+            ctx.save();
+            ctx.globalAlpha = bumpFlash * 0.25;
+            ctx.fillStyle = "#ff9e94"; // clay coral
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+          }
+
+          // 1. Maze walls
+          ctx.strokeStyle = "#8a6a50"; // clay warm brown
+          ctx.lineWidth = Math.max(3, 9 - Math.floor(gridSize / 2));
+          ctx.lineCap = "round";
+
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              let x = c * cellSize;
+              let y = r * cellSize;
+              let cell = maze[r][c];
+              ctx.beginPath();
+              if (cell.walls.top) {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + cellSize, y);
+              }
+              if (cell.walls.right) {
+                ctx.moveTo(x + cellSize, y);
+                ctx.lineTo(x + cellSize, y + cellSize);
+              }
+              if (cell.walls.bottom) {
+                ctx.moveTo(x, y + cellSize);
+                ctx.lineTo(x + cellSize, y + cellSize);
+              }
+              if (cell.walls.left) {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x, y + cellSize);
+              }
+              ctx.stroke();
+            }
+          }
+
+          // 2. Guiding sparkle line
+          if (guidePath.length > 1 && guideProgress > 0) {
+            ctx.save();
+            ctx.globalAlpha = guideAlpha;
+            ctx.strokeStyle = "#5cb98a"; // clay mint green
+            ctx.lineWidth = Math.max(5, 11 - Math.floor(gridSize / 2));
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.setLineDash([9, 7]);
+
+            ctx.beginPath();
+            let startX = guidePath[0].x * cellSize + cellSize / 2;
+            let startY = guidePath[0].y * cellSize + cellSize / 2;
+            ctx.moveTo(startX, startY);
+
+            let nodesToDraw = Math.floor(guideProgress);
+            for (let i = 1; i < nodesToDraw && i < guidePath.length; i++) {
+              let px = guidePath[i].x * cellSize + cellSize / 2;
+              let py = guidePath[i].y * cellSize + cellSize / 2;
+              ctx.lineTo(px, py);
+            }
+
+            let partial = guideProgress - nodesToDraw;
+            if (partial > 0 && nodesToDraw < guidePath.length) {
+              let p1 = guidePath[nodesToDraw - 1];
+              let p2 = guidePath[nodesToDraw];
+              if (p1 && p2) {
+                let currentX =
+                  (p1.x + (p2.x - p1.x) * partial) * cellSize + cellSize / 2;
+                let currentY =
+                  (p1.y + (p2.y - p1.y) * partial) * cellSize + cellSize / 2;
+                ctx.lineTo(currentX, currentY);
+              }
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // 3. Emojis
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+
+          // Goal (gentle pulse so toddlers know where "home" is)
+          const goalPulse = 1 + Math.sin(Date.now() / 400) * 0.05;
+          ctx.save();
+          ctx.font = `${cellSize * 0.65 * goalPulse}px sans-serif`;
+          ctx.fillText(
+            "🏡",
+            goal.x * cellSize + cellSize / 2,
+            goal.y * cellSize + cellSize / 2,
+          );
+          ctx.restore();
+
+          // Carrot with a little bounce when just eaten (visual only affects newly spawned one via scale-in)
+          if (carrot.x >= 0 && carrot.y >= 0) {
+            ctx.save();
+            const wob = 1 + Math.sin(Date.now() / 250) * 0.06;
+            ctx.font = `${cellSize * 0.6 * wob}px sans-serif`;
+            ctx.fillText(
+              "🥕",
+              carrot.x * cellSize + cellSize / 2,
+              carrot.y * cellSize + cellSize / 2,
+            );
+            ctx.restore();
+          }
+
+          // Rabbit with a hop squash/stretch
+          ctx.save();
+          const hopLift = hopAnim
+            ? Math.sin(hopAnim.t * Math.PI) * cellSize * 0.28
+            : 0;
+          const rx = rabbitDisplay.x * cellSize + cellSize / 2;
+          const ry = rabbitDisplay.y * cellSize + cellSize / 2 - hopLift;
+          ctx.font = `${cellSize * 0.65}px sans-serif`;
+          ctx.fillText("🐇", rx, ry);
+          ctx.restore();
+        }
+
+        // ---------- Input ----------
+        document
+          .getElementById("level-selector")
+          .addEventListener("click", (e) => {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+            document
+              .querySelectorAll("#level-selector .btn")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentLevel = parseInt(btn.dataset.level);
+            initGame();
+          });
+
+        document.querySelectorAll(".arrow-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            moveRabbit(parseInt(btn.dataset.dx), parseInt(btn.dataset.dy));
+          });
+        });
+
+        window.addEventListener("keydown", (e) => {
+          switch (e.key) {
+            case "ArrowUp":
+            case "w":
+            case "W":
+              moveRabbit(0, -1);
+              break;
+            case "ArrowDown":
+            case "s":
+            case "S":
+              moveRabbit(0, 1);
+              break;
+            case "ArrowLeft":
+            case "a":
+            case "A":
+              moveRabbit(-1, 0);
+              break;
+            case "ArrowRight":
+            case "d":
+            case "D":
+              moveRabbit(1, 0);
+              break;
+          }
+        });
+
+        // Swipe support for touch screens (handy for toddlers on tablets)
+        let touchStartX = null,
+          touchStartY = null;
+        canvas.addEventListener(
+          "touchstart",
+          (e) => {
+            const t = e.touches[0];
+            touchStartX = t.clientX;
+            touchStartY = t.clientY;
+          },
+          { passive: true },
+        );
+        canvas.addEventListener(
+          "touchend",
+          (e) => {
+            if (touchStartX === null) return;
+            const t = e.changedTouches[0];
+            const dx = t.clientX - touchStartX;
+            const dy = t.clientY - touchStartY;
+            const absX = Math.abs(dx),
+              absY = Math.abs(dy);
+            if (Math.max(absX, absY) > 20) {
+              if (absX > absY) moveRabbit(dx > 0 ? 1 : -1, 0);
+              else moveRabbit(0, dy > 0 ? 1 : -1);
+            }
+            touchStartX = null;
+            touchStartY = null;
+          },
+          { passive: true },
+        );
+
+        window.resetGame = function () {
+          initGame();
+        };
+
+        initGame();
+      })();
+    </script>
+  </body>
+</html>
