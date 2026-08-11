@@ -551,3 +551,145 @@
     margin-inline: auto;
   }
 }
+/* ============================================================
+   Additions for tag filtering + expand/Play card interaction.
+   Append to css/menu.css (alongside the earlier menu-additions.css
+   for content-tabs/hero-trust). Phone-first, same token set.
+   ============================================================ */
+
+/* ---------- Tag chip row (multi-select, OR logic) ---------- */
+.tag-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 1rem 0.5rem;
+}
+
+.tag-chip {
+  /* inherits .filter-chip base styling; active state differs slightly
+     (accent color, not brand) so multi-select tags read as distinct
+     from the single-select badge filter row above them */
+}
+
+.tag-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* ---------- Card restructure: toggle head + expandable body ---------- */
+.game-card {
+  /* now a plain wrapper, not a button — contains a toggle button + an
+     expandable content region, so it can't itself be interactive */
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.game-card-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 88px;
+  padding: 0.75rem;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.game-card-toggle:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+.game-card-toggle .game-arrow {
+  transition: transform 0.15s ease;
+}
+
+.game-card-toggle[aria-expanded="true"] .game-arrow {
+  transform: rotate(180deg);
+}
+
+.game-card.is-loading {
+  opacity: 0.85;
+}
+
+/* ---------- Expanded body ---------- */
+.game-card-expanded {
+  padding: 0 0.9rem 0.9rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+.game-card-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.6rem;
+}
+
+.game-card-video,
+.game-card-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.game-card-media-fallback {
+  font-size: 2.2rem;
+}
+
+.game-card-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.game-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.tag-pill {
+  display: inline-flex;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.game-card-desc {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.game-card-play {
+  width: 100%;
+}
+
+/* ---------- Tablet/desktop: keep expanded media from stretching too tall ---------- */
+@media (min-width: 600px) {
+  .game-card-media {
+    aspect-ratio: 21 / 9;
+  }
+}

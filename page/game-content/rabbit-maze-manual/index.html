@@ -1,0 +1,1992 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Rabbit Maze Express 🐇🥕</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        font-family: "Baloo 2", "Comic Sans MS", "Chalkboard SE", sans-serif;
+      }
+
+      :root {
+        /* ---------- Clay palette (design tokens) ---------- */
+        --clay-bg-1: #fdeed8;
+        --clay-bg-2: #f8dfc4;
+        --clay-bg-3: #f2d2c4;
+        --clay-surface: #fff7ee;
+        --clay-surface-2: #fcebda;
+        --clay-mint: #bfe8cd;
+        --clay-mint-deep: #93c9a9;
+        --clay-sky: #cfe6f7;
+        --clay-sky-deep: #9dbeda;
+        --clay-peach: #ffcfb0;
+        --clay-peach-deep: #db9f80;
+        --clay-coral: #ff9e94;
+        --clay-coral-deep: #d97a70;
+        --clay-lilac: #e3d0f0;
+        --clay-lilac-deep: #b394ca;
+        --clay-butter: #ffdf8e;
+        --clay-butter-deep: #e0b554;
+        --clay-terracotta: #c4653f;
+        --clay-text: #6b5040;
+        --clay-text-soft: #8a6d5a;
+        --clay-green-text: #3f6b50;
+        --clay-brown-text: #7a5520;
+        --clay-canvas: #fdf6ec;
+        --clay-wall: #8a6a50;
+        --clay-guide: #5cb98a;
+        --clay-bump: #ff9e94;
+
+        --radius-sm: 16px;
+        --radius-md: 22px;
+        --radius-lg: 30px;
+        --radius-pill: 999px;
+
+        --clay-highlight: inset 0 2px 3px rgba(255, 255, 255, 0.85);
+        --clay-shade: inset 0 -3px 5px rgba(0, 0, 0, 0.07);
+        --clay-pressed: inset 0 4px 8px rgba(0, 0, 0, 0.12);
+      }
+
+      body {
+        margin: 0;
+        padding: 14px;
+        background: linear-gradient(
+          160deg,
+          var(--clay-bg-1) 0%,
+          var(--clay-bg-2) 50%,
+          var(--clay-bg-3) 100%
+        );
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      h1 {
+        color: var(--clay-terracotta);
+        margin: 0 0 10px 0;
+        font-size: 2.2rem;
+        font-weight: 800;
+        text-shadow: 3px 3px 0px #fff;
+        text-align: center;
+      }
+
+      .controls-panel {
+        background: var(--clay-surface);
+        padding: 12px 20px;
+        border-radius: var(--radius-lg);
+        box-shadow:
+          0 10px 0 #e8c9a8,
+          0 16px 26px rgba(160, 110, 70, 0.2),
+          var(--clay-highlight),
+          var(--clay-shade);
+        display: flex;
+        flex-direction: row;
+        gap: 14px;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 12px;
+        max-width: 560px;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .controls-panel.supervisor {
+        border: 3px dashed var(--clay-sky-deep);
+        position: relative;
+        padding-top: 26px;
+      }
+
+      .panel-label {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--clay-sky);
+        color: #47708f;
+        font-size: 0.85rem;
+        font-weight: 800;
+        padding: 3px 14px;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+        box-shadow: 0 3px 0 var(--clay-sky-deep);
+      }
+
+      .setting-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .setting-group label {
+        font-weight: 800;
+        font-size: 0.92rem;
+        color: var(--clay-text);
+      }
+
+      select {
+        font: inherit;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--clay-text);
+        background: var(--clay-surface-2);
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 7px 10px;
+        outline: none;
+        box-shadow:
+          0 4px 0 #d8b794,
+          var(--clay-highlight),
+          var(--clay-shade);
+        cursor: pointer;
+      }
+      select:active {
+        transform: translateY(2px);
+        box-shadow:
+          0 2px 0 #d8b794,
+          var(--clay-pressed);
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        background: var(--clay-surface-2);
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 8px 14px;
+        font-weight: 800;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        line-height: 1;
+        color: var(--clay-text);
+        box-shadow:
+          0 5px 0 #d8b794,
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      .btn.active {
+        background: var(--clay-butter);
+        box-shadow:
+          0 2px 0 var(--clay-butter-deep),
+          var(--clay-pressed);
+        transform: translateY(3px) scale(1.08);
+      }
+
+      .btn:active {
+        transform: translateY(2px) scale(0.97);
+        box-shadow:
+          0 3px 0 #d8b794,
+          inset 0 3px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn.start-game {
+        background: var(--clay-sky);
+        font-size: 1.1rem;
+        padding: 9px 16px;
+        box-shadow:
+          0 5px 0 var(--clay-sky-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      .sound-btn {
+        background: var(--clay-sky);
+        border: none;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow:
+          0 5px 0 var(--clay-sky-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      .sound-btn:active {
+        transform: translateY(2px);
+        box-shadow:
+          0 3px 0 var(--clay-sky-deep),
+          inset 0 3px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .stats-bar {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        max-width: 560px;
+        background: var(--clay-mint);
+        color: var(--clay-green-text);
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+        box-shadow:
+          0 8px 0 var(--clay-mint-deep),
+          0 12px 20px rgba(80, 130, 100, 0.22),
+          var(--clay-highlight),
+          var(--clay-shade);
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      #map-info,
+      #guide-info {
+        white-space: nowrap;
+      }
+
+      #game-container {
+        position: relative;
+        background: var(--clay-surface);
+        border-radius: var(--radius-lg);
+        padding: 12px;
+        box-shadow:
+          0 12px 0 #e0c4a4,
+          0 18px 28px rgba(150, 100, 60, 0.24),
+          var(--clay-highlight),
+          var(--clay-shade);
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+        border-radius: var(--radius-md);
+        background: var(--clay-canvas);
+        touch-action: none;
+        cursor: grab;
+        box-shadow: inset 0 4px 10px rgba(140, 95, 55, 0.14);
+        width: min(88vw, 440px);
+        height: auto;
+      }
+
+      .toast {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translate(-50%, -40px);
+        background: var(--clay-butter);
+        border: none;
+        border-radius: var(--radius-pill);
+        padding: 8px 22px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        color: var(--clay-brown-text);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+        z-index: 5;
+        box-shadow:
+          0 5px 0 var(--clay-butter-deep),
+          0 10px 18px rgba(150, 110, 40, 0.28),
+          var(--clay-highlight);
+        max-width: 86%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0px);
+      }
+
+      .action-row {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        border: none;
+        border-radius: var(--radius-pill);
+        padding: 14px 26px;
+        font-weight: 800;
+        font-size: 1.35rem;
+        cursor: pointer;
+        transition: all 0.12s ease;
+        color: var(--clay-text);
+        touch-action: manipulation;
+      }
+      .action-btn:disabled {
+        opacity: 0.45;
+        transform: translateY(2px);
+        box-shadow:
+          0 3px 0 rgba(0, 0, 0, 0.12),
+          var(--clay-pressed);
+        cursor: default;
+      }
+      .action-btn:active:not(:disabled) {
+        transform: translateY(3px) scale(0.97);
+        box-shadow:
+          0 3px 0 rgba(0, 0, 0, 0.14),
+          var(--clay-pressed);
+      }
+
+      .action-btn.play {
+        background: var(--clay-mint);
+        box-shadow:
+          0 7px 0 var(--clay-mint-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .action-btn.pause {
+        background: var(--clay-butter);
+        box-shadow:
+          0 7px 0 var(--clay-butter-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .action-btn.reset {
+        background: var(--clay-coral);
+        color: #fff;
+        box-shadow:
+          0 7px 0 var(--clay-coral-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+
+      .guide-box {
+        margin-top: 18px;
+        background: var(--clay-surface);
+        border-radius: var(--radius-lg);
+        padding: 14px 16px;
+        max-width: 560px;
+        width: 100%;
+        box-shadow:
+          0 10px 0 #e8c9a8,
+          0 16px 26px rgba(160, 110, 70, 0.2),
+          var(--clay-highlight),
+          var(--clay-shade);
+        transition: opacity 0.2s ease;
+      }
+      .guide-box.locked {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      .guide-title {
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--clay-text);
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      .guide-title small {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--clay-text-soft);
+        font-weight: 600;
+        margin-top: 2px;
+      }
+
+      .guide-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        min-height: 10px;
+      }
+
+      .guide-card {
+        position: relative;
+        width: 78px;
+        height: 78px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        touch-action: none;
+        box-shadow:
+          0 7px 0 rgba(0, 0, 0, 0.16),
+          inset 0 2px 3px rgba(255, 255, 255, 0.75),
+          inset 0 -3px 5px rgba(0, 0, 0, 0.12);
+        transition:
+          transform 0.1s ease,
+          box-shadow 0.1s ease;
+      }
+      .guide-card:active {
+        transform: translateY(4px) scale(0.96);
+        box-shadow:
+          0 3px 0 rgba(0, 0, 0, 0.16),
+          var(--clay-pressed);
+      }
+
+      .g-arrow {
+        font-size: 2.1rem;
+        line-height: 1;
+        color: #fff;
+        text-shadow: 0 3px 0 rgba(0, 0, 0, 0.14);
+      }
+
+      .g-mult {
+        position: absolute;
+        bottom: 5px;
+        right: 6px;
+        background: rgba(0, 0, 0, 0.18);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 800;
+        padding: 1px 7px;
+        border-radius: var(--radius-pill);
+      }
+
+      .g-count {
+        position: absolute;
+        top: 5px;
+        left: 6px;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 5px;
+        background: #fff;
+        color: var(--clay-terracotta);
+        border-radius: var(--radius-pill);
+        font-size: 0.8rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+      }
+
+      #drag-ghost {
+        position: fixed;
+        pointer-events: none;
+        z-index: 99;
+        display: none;
+        transform: translate(-50%, -65%);
+        font-size: 2.6rem;
+        line-height: 1;
+        text-shadow: 0 4px 0 rgba(0, 0, 0, 0.16);
+      }
+      #drag-ghost .ghost-mult {
+        position: absolute;
+        bottom: -6px;
+        right: -12px;
+        background: var(--clay-butter);
+        color: var(--clay-brown-text);
+        border-radius: var(--radius-pill);
+        font-size: 0.95rem;
+        font-weight: 800;
+        padding: 1px 8px;
+        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+      }
+
+      .modal {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 246, 235, 0.96);
+        border-radius: 26px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        text-align: center;
+        box-shadow:
+          inset 0 3px 6px rgba(255, 255, 255, 0.9),
+          inset 0 -5px 10px rgba(160, 100, 60, 0.08);
+      }
+      .modal .big-emoji {
+        font-size: 4rem;
+        margin-bottom: 6px;
+        animation: bounce 0.6s ease infinite alternate;
+      }
+      @keyframes bounce {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-14px);
+        }
+      }
+      .modal h2 {
+        font-size: 2.1rem;
+        color: var(--clay-terracotta);
+        margin: 0 0 10px 0;
+      }
+      .modal p {
+        font-size: 1.15rem;
+        color: var(--clay-text-soft);
+        margin-top: -6px;
+      }
+      .modal button {
+        background: var(--clay-mint);
+        border: none;
+        padding: 12px 28px;
+        font-size: 1.3rem;
+        border-radius: var(--radius-pill);
+        font-weight: 800;
+        color: var(--clay-green-text);
+        cursor: pointer;
+        box-shadow:
+          0 6px 0 var(--clay-mint-deep),
+          var(--clay-highlight),
+          var(--clay-shade);
+      }
+      .modal button:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 3px 0 var(--clay-mint-deep),
+          var(--clay-pressed);
+      }
+
+      .confetti-piece {
+        position: absolute;
+        top: -10px;
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        pointer-events: none;
+        animation: fall linear forwards;
+        z-index: 11;
+      }
+      @keyframes fall {
+        to {
+          transform: translateY(420px) rotate(360deg);
+          opacity: 0.2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Rabbit Maze Express 🐇</h1>
+
+    <!-- Supervisor panel: map size + setup + fresh maze -->
+    <div class="controls-panel supervisor">
+      <div class="panel-label">👨‍👩‍👧 For Grown-Ups</div>
+      <div class="setting-group">
+        <label>Map Size</label>
+        <select id="map-size">
+          <option value="6">🟩 6×6</option>
+          <option value="8">🟦 8×8</option>
+          <option value="10">🟪 10×10</option>
+          <option value="12">🟧 12×12</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label>Map Setup</label>
+        <select id="map-setup">
+          <option value="meadow">🌼 Meadow (open)</option>
+          <option value="forest" selected>🌲 Forest (classic)</option>
+          <option value="caves">⛰️ Caves (twisty)</option>
+        </select>
+      </div>
+      <button class="btn start-game" id="start-game">🎮 Start Game</button>
+      <button class="sound-btn" id="sound-toggle" title="Toggle sound">
+        🔊
+      </button>
+    </div>
+
+    <!-- Toddler difficulty -->
+    <div class="controls-panel">
+      <div class="setting-group">
+        <label>Level</label>
+        <div class="btn-group" id="level-selector">
+          <button
+            class="btn active"
+            data-level="1"
+            title="Unlimited arrows + floor hints"
+          >
+            🥕
+          </button>
+          <button class="btn" data-level="2" title="Unlimited arrows">
+            🍎
+          </button>
+          <button
+            class="btn"
+            data-level="3"
+            title="Limited arrows + floor hints"
+          >
+            🍇
+          </button>
+          <button class="btn" data-level="4" title="Limited arrows">🍩</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <span id="map-info">🗺️ 🌲 Forest · 6×6</span>
+      <span id="guide-info">🧭 0 placed · ∞ left</span>
+    </div>
+
+    <div id="game-container">
+      <canvas id="mazeCanvas" width="420" height="420"></canvas>
+      <div class="toast" id="toast">Yay!</div>
+      <div class="modal" id="winModal">
+        <div class="big-emoji">🎉</div>
+        <h2>YOU DID IT!</h2>
+        <p style="font-size: 1.15rem; color: #8a6d5a; margin-top: -6px">
+          The bunny is home safe! 🏡💚
+        </p>
+        <button onclick="resetGame()">Play Again 🔄</button>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn play" id="play-btn">▶ Play</button>
+      <button class="action-btn pause" id="pause-btn" disabled>⏸ Pause</button>
+      <button class="action-btn reset" id="reset-btn">🔄 Reset</button>
+    </div>
+
+    <div class="guide-box" id="guide-box">
+      <div class="guide-title">
+        🧭 Guides
+        <small>Drag a guide onto the maze, then press ▶ Play!</small>
+      </div>
+      <div class="guide-grid" id="guide-grid"></div>
+    </div>
+
+    <div id="drag-ghost">
+      <span id="ghost-arrow">▶</span>
+      <span class="ghost-mult" id="ghost-mult"></span>
+    </div>
+
+    <script>
+      (function () {
+        const canvas = document.getElementById("mazeCanvas");
+        const ctx = canvas.getContext("2d");
+        const winModal = document.getElementById("winModal");
+        const gameContainer = document.getElementById("game-container");
+        const toast = document.getElementById("toast");
+        const mapInfoEl = document.getElementById("map-info");
+        const guideInfoEl = document.getElementById("guide-info");
+        const soundToggleBtn = document.getElementById("sound-toggle");
+        const playBtn = document.getElementById("play-btn");
+        const pauseBtn = document.getElementById("pause-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const startGameBtn = document.getElementById("start-game");
+        const mapSizeSel = document.getElementById("map-size");
+        const mapSetupSel = document.getElementById("map-setup");
+        const guideBox = document.getElementById("guide-box");
+        const guideGrid = document.getElementById("guide-grid");
+        const ghost = document.getElementById("drag-ghost");
+        const ghostArrow = document.getElementById("ghost-arrow");
+        const ghostMult = document.getElementById("ghost-mult");
+
+        const CANVAS = 420;
+
+        // ---------- Sound (Web Audio, no external files) ----------
+        let soundOn = true;
+        let audioCtx = null;
+
+        function ensureAudio() {
+          if (!audioCtx) {
+            try {
+              audioCtx = new (
+                window.AudioContext || window.webkitAudioContext
+              )();
+            } catch (e) {
+              audioCtx = null;
+            }
+          }
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        }
+
+        function beep(freq, duration, type, delay, gainPeak) {
+          if (!soundOn || !audioCtx) return;
+          const t0 = audioCtx.currentTime + (delay || 0);
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || "sine";
+          osc.frequency.setValueAtTime(freq, t0);
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(gainPeak || 0.18, t0 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t0);
+          osc.stop(t0 + duration + 0.05);
+        }
+
+        function playHop() {
+          beep(440, 0.08, "square", 0, 0.09);
+        }
+        function playPlace() {
+          beep(520, 0.07, "triangle", 0, 0.12);
+          beep(700, 0.09, "triangle", 0.06, 0.12);
+        }
+        function playPickup() {
+          beep(320, 0.06, "triangle", 0, 0.09);
+        }
+        function playBump() {
+          beep(180, 0.1, "sawtooth", 0, 0.12);
+        }
+        function playWin() {
+          [523, 659, 784, 1047].forEach((f, i) =>
+            beep(f, 0.22, "triangle", i * 0.12, 0.2),
+          );
+        }
+
+        soundToggleBtn.addEventListener("click", () => {
+          soundOn = !soundOn;
+          soundToggleBtn.textContent = soundOn ? "🔊" : "🔇";
+          ensureAudio();
+        });
+
+        // ---------- Direction / guide definitions ----------
+        const DIRS = {
+          up: { dx: 0, dy: -1, glyph: "▲" },
+          right: { dx: 1, dy: 0, glyph: "▶" },
+          down: { dx: 0, dy: 1, glyph: "▼" },
+          left: { dx: -1, dy: 0, glyph: "◀" },
+        };
+        const DIR_COLORS = {
+          up: "#5cb98a",
+          right: "#9dbeda",
+          down: "#ff9e94",
+          left: "#b394ca",
+        };
+        const DIR_ORDER = ["up", "right", "down", "left"];
+
+        // ---------- Difficulty levels ----------
+        const levelConfig = {
+          1: { unlimited: true, hints: true },
+          2: { unlimited: true, hints: false },
+          3: { unlimited: false, hints: true },
+          4: { unlimited: false, hints: false },
+        };
+
+        // ---------- Map setups (supervisor) ----------
+        const setupConfig = {
+          meadow: {
+            name: "Meadow",
+            emoji: "🌼",
+            wallColor: "#7a9c6e",
+            open: true,
+            caves: false,
+          },
+          forest: {
+            name: "Forest",
+            emoji: "🌲",
+            wallColor: "#8a6a50",
+            open: false,
+            caves: false,
+          },
+          caves: {
+            name: "Caves",
+            emoji: "⛰️",
+            wallColor: "#6e5a8a",
+            open: false,
+            caves: true,
+          },
+        };
+
+        // ---------- Game state ----------
+        let currentLevel = 1;
+        let currentSetup = "forest";
+        let gridSize = 6;
+        let cellSize = CANVAS / gridSize;
+
+        let rabbit = { x: 0, y: 0 };
+        let rabbitDisplay = { x: 0, y: 0 };
+        let hopAnim = null;
+        let bumpFlash = 0;
+
+        let goal = { x: gridSize - 1, y: gridSize - 1 };
+        let maze = [];
+
+        // Guides
+        let boxSlots = []; // {dir, mult, count, unlimited}
+        let placedGuides = []; // {dir, mult, x, y, used, dragging}
+
+        // Run state machine: 'idle' | 'running' | 'stuck' | 'won'
+        let runState = "idle";
+        let runQueue = [];
+        let active = null;
+        let stepsLeft = 0;
+        let stepTimer = null;
+        let stuckTimer = null;
+        let stuckDir = null;
+        let stuckTick = 0;
+
+        let drag = null; // {from:'box'|'board', dir, mult, guide?, tile?, pointerId}
+
+        // ---------- Maze generation ----------
+        class Cell {
+          constructor(r, c) {
+            this.r = r;
+            this.c = c;
+            this.walls = { top: true, right: true, bottom: true, left: true };
+            this.visited = false;
+          }
+        }
+
+        function generateMaze() {
+          maze = [];
+          for (let r = 0; r < gridSize; r++) {
+            let row = [];
+            for (let c = 0; c < gridSize; c++) row.push(new Cell(r, c));
+            maze.push(row);
+          }
+
+          let stack = [];
+          let current = maze[0][0];
+          current.visited = true;
+
+          while (true) {
+            let unvisited = getNeighbors(current);
+            if (unvisited.length > 0) {
+              let next =
+                unvisited[Math.floor(Math.random() * unvisited.length)];
+              removeWalls(current, next);
+              stack.push(current);
+              current = next;
+              current.visited = true;
+            } else if (stack.length > 0) {
+              current = stack.pop();
+            } else {
+              break;
+            }
+          }
+
+          const setup = setupConfig[currentSetup];
+          if (setup.open) openUpMaze();
+          if (setup.caves) addDeadEnds();
+        }
+
+        function getNeighbors(cell) {
+          let neighbors = [];
+          let { r, c } = cell;
+          if (r > 0 && !maze[r - 1][c].visited) neighbors.push(maze[r - 1][c]);
+          if (c < gridSize - 1 && !maze[r][c + 1].visited)
+            neighbors.push(maze[r][c + 1]);
+          if (r < gridSize - 1 && !maze[r + 1][c].visited)
+            neighbors.push(maze[r + 1][c]);
+          if (c > 0 && !maze[r][c - 1].visited) neighbors.push(maze[r][c - 1]);
+          return neighbors;
+        }
+
+        function removeWalls(a, b) {
+          let dr = a.r - b.r;
+          let dc = a.c - b.c;
+          if (dr === 1) {
+            a.walls.top = false;
+            b.walls.bottom = false;
+          } else if (dr === -1) {
+            a.walls.bottom = false;
+            b.walls.top = false;
+          }
+          if (dc === 1) {
+            a.walls.left = false;
+            b.walls.right = false;
+          } else if (dc === -1) {
+            a.walls.right = false;
+            b.walls.left = false;
+          }
+        }
+
+        // Meadow: knock out extra walls so corridors open up
+        function openUpMaze() {
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              const cell = maze[r][c];
+              const opts = [];
+              if (r > 0) opts.push([maze[r - 1][c], "top"]);
+              if (c < gridSize - 1) opts.push([maze[r][c + 1], "right"]);
+              if (r < gridSize - 1) opts.push([maze[r + 1][c], "bottom"]);
+              if (c > 0) opts.push([maze[r][c - 1], "left"]);
+              for (const [nb, wall] of opts) {
+                if (cell.walls[wall] && Math.random() < 0.32) {
+                  cell.walls[wall] = false;
+                  nb.walls[
+                    {
+                      top: "bottom",
+                      right: "left",
+                      bottom: "top",
+                      left: "right",
+                    }[wall]
+                  ] = false;
+                }
+              }
+            }
+          }
+        }
+
+        // Caves: add dead ends by closing random edges that keep start↔goal connected
+        function addDeadEnds() {
+          const edges = [];
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              if (c < gridSize - 1) edges.push([r, c, "right"]);
+              if (r < gridSize - 1) edges.push([r, c, "bottom"]);
+            }
+          }
+          // shuffle
+          for (let i = edges.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [edges[i], edges[j]] = [edges[j], edges[i]];
+          }
+          const wanted = Math.min(edges.length, gridSize * gridSize);
+          let added = 0;
+          for (const [r, c, wall] of edges) {
+            if (added >= wanted) break;
+            const cell = maze[r][c];
+            if (!cell.walls[wall]) {
+              cell.walls[wall] = true;
+              const opp =
+                wall === "right"
+                  ? "left"
+                  : wall === "left"
+                    ? "right"
+                    : wall === "top"
+                      ? "bottom"
+                      : "top";
+              const nr = wall === "bottom" ? r + 1 : wall === "top" ? r - 1 : r;
+              const nc = wall === "right" ? c + 1 : wall === "left" ? c - 1 : c;
+              maze[nr][nc].walls[opp] = true;
+              if (!isReachable()) {
+                cell.walls[wall] = false;
+                maze[nr][nc].walls[opp] = false;
+              } else {
+                added++;
+              }
+            }
+          }
+        }
+
+        function isReachable() {
+          const seen = new Set();
+          const q = [[0, 0]];
+          seen.add("0,0");
+          while (q.length) {
+            const [r, c] = q.shift();
+            if (r === gridSize - 1 && c === gridSize - 1) return true;
+            const cell = maze[r][c];
+            if (!cell.walls.top && r > 0 && !seen.has(r - 1 + "," + c)) {
+              seen.add(r - 1 + "," + c);
+              q.push([r - 1, c]);
+            }
+            if (
+              !cell.walls.right &&
+              c < gridSize - 1 &&
+              !seen.has(r + "," + (c + 1))
+            ) {
+              seen.add(r + "," + (c + 1));
+              q.push([r, c + 1]);
+            }
+            if (
+              !cell.walls.bottom &&
+              r < gridSize - 1 &&
+              !seen.has(r + 1 + "," + c)
+            ) {
+              seen.add(r + 1 + "," + c);
+              q.push([r + 1, c]);
+            }
+            if (!cell.walls.left && c > 0 && !seen.has(r + "," + (c - 1))) {
+              seen.add(r + "," + (c - 1));
+              q.push([r, c - 1]);
+            }
+          }
+          return false;
+        }
+
+        // ---------- Pathfinding ----------
+        function bfsPath(start, target) {
+          const queue = [[{ x: start.x, y: start.y }]];
+          const visited = new Set();
+          visited.add(start.x + "," + start.y);
+          while (queue.length > 0) {
+            const path = queue.shift();
+            const curr = path[path.length - 1];
+            if (curr.x === target.x && curr.y === target.y) return path;
+            const cell = maze[curr.y][curr.x];
+            const moves = [
+              { x: curr.x, y: curr.y - 1, wall: cell.walls.top, dir: "up" },
+              {
+                x: curr.x + 1,
+                y: curr.y,
+                wall: cell.walls.right,
+                dir: "right",
+              },
+              {
+                x: curr.x,
+                y: curr.y + 1,
+                wall: cell.walls.bottom,
+                dir: "down",
+              },
+              { x: curr.x - 1, y: curr.y, wall: cell.walls.left, dir: "left" },
+            ];
+            for (const m of moves) {
+              const key = m.x + "," + m.y;
+              if (
+                !m.wall &&
+                m.x >= 0 &&
+                m.x < gridSize &&
+                m.y >= 0 &&
+                m.y < gridSize &&
+                !visited.has(key)
+              ) {
+                visited.add(key);
+                queue.push([...path, { x: m.x, y: m.y, dir: m.dir }]);
+              }
+            }
+          }
+          return null;
+        }
+
+        function directionOf(a, b) {
+          if (b.x === a.x + 1) return "right";
+          if (b.x === a.x - 1) return "left";
+          if (b.y === a.y + 1) return "down";
+          return "up";
+        }
+
+        function canMove(x, y, dir) {
+          const d = DIRS[dir];
+          const bx = x + d.dx;
+          const by = y + d.dy;
+          if (bx < 0 || bx >= gridSize || by < 0 || by >= gridSize)
+            return false;
+          const cell = maze[y][x];
+          if (dir === "up" && cell.walls.top) return false;
+          if (dir === "right" && cell.walls.right) return false;
+          if (dir === "down" && cell.walls.bottom) return false;
+          if (dir === "left" && cell.walls.left) return false;
+          return true;
+        }
+
+        function atGoalPoint(p) {
+          return p.x === goal.x && p.y === goal.y;
+        }
+
+        function atGoal() {
+          return atGoalPoint(rabbit);
+        }
+
+        function maxHopsFrom(x, y, dir) {
+          let n = 0;
+          while (canMove(x, y, dir)) {
+            const d = DIRS[dir];
+            x += d.dx;
+            y += d.dy;
+            n++;
+            if (atGoalPoint({ x, y })) break;
+          }
+          return n;
+        }
+
+        // ---------- Guide box ----------
+        function provisionBox() {
+          boxSlots = [];
+          const lv = levelConfig[currentLevel];
+          if (lv.unlimited) {
+            for (const d of DIR_ORDER) {
+              for (let m = 1; m <= 3; m++) {
+                boxSlots.push({
+                  dir: d,
+                  mult: m,
+                  count: Infinity,
+                  unlimited: true,
+                });
+              }
+            }
+          } else {
+            // Exact path-length kit: chunk each straight run into 1x/2x/3x arrows.
+            const path = bfsPath({ x: 0, y: 0 }, goal);
+            const counts = {};
+            if (path && path.length > 1) {
+              const dirs = [];
+              for (let i = 1; i < path.length; i++) {
+                dirs.push(directionOf(path[i - 1], path[i]));
+              }
+              let i = 0;
+              while (i < dirs.length) {
+                const d = dirs[i];
+                let j = i;
+                while (j < dirs.length && dirs[j] === d) j++;
+                let run = j - i;
+                while (run > 0) {
+                  const m = Math.min(3, run);
+                  const key = d + "-" + m;
+                  counts[key] = (counts[key] || 0) + 1;
+                  run -= m;
+                }
+                i = j;
+              }
+            }
+            for (const key of Object.keys(counts)) {
+              const [dir, mult] = key.split("-");
+              boxSlots.push({
+                dir,
+                mult: parseInt(mult, 10),
+                count: counts[key],
+                unlimited: false,
+              });
+            }
+          }
+          renderGuideBox();
+        }
+
+        function findSlot(dir, mult) {
+          return boxSlots.find(
+            (s) => s.dir === dir && s.mult === mult && s.count > 0,
+          );
+        }
+
+        function takeFromBox(dir, mult) {
+          if (levelConfig[currentLevel].unlimited) return true;
+          const slot = findSlot(dir, mult);
+          if (!slot) return false;
+          slot.count--;
+          if (slot.count <= 0) {
+            boxSlots = boxSlots.filter((s) => s !== slot);
+          }
+          renderGuideBox();
+          return true;
+        }
+
+        function returnToBox(dir, mult) {
+          if (levelConfig[currentLevel].unlimited) return;
+          const slot = boxSlots.find((s) => s.dir === dir && s.mult === mult);
+          if (slot) slot.count++;
+          else boxSlots.push({ dir, mult, count: 1, unlimited: false });
+          renderGuideBox();
+        }
+
+        function guideBoxCount() {
+          return boxSlots.reduce((sum, s) => sum + s.count, 0);
+        }
+
+        function renderGuideBox() {
+          guideGrid.innerHTML = "";
+          for (const slot of boxSlots) {
+            if (slot.count <= 0) continue;
+            const card = document.createElement("div");
+            card.className = "guide-card";
+            card.style.background = DIR_COLORS[slot.dir];
+            card.dataset.dir = slot.dir;
+            card.dataset.mult = String(slot.mult);
+
+            const arrow = document.createElement("div");
+            arrow.className = "g-arrow";
+            arrow.textContent = DIRS[slot.dir].glyph;
+
+            const mult = document.createElement("div");
+            mult.className = "g-mult";
+            if (slot.mult > 1) mult.textContent = "×" + slot.mult;
+
+            const count = document.createElement("div");
+            count.className = "g-count";
+            count.textContent = slot.unlimited ? "∞" : slot.count;
+
+            card.append(arrow, mult, count);
+            card.addEventListener("pointerdown", (e) => {
+              e.preventDefault();
+              startDragFromBox(e, slot.dir, slot.mult);
+            });
+            card.addEventListener("contextmenu", (e) => e.preventDefault());
+            guideGrid.appendChild(card);
+          }
+        }
+
+        // ---------- Dragging ----------
+        function startDragFromBox(e, dir, mult) {
+          if (runState !== "idle") return;
+          ensureAudio();
+          playPickup();
+          drag = {
+            from: "box",
+            dir,
+            mult,
+            guide: null,
+            tile: null,
+            pointerId: e.pointerId,
+          };
+          window.addEventListener("pointermove", onDragMove);
+          window.addEventListener("pointerup", onDragEnd);
+          showGhost(e.clientX, e.clientY);
+        }
+
+        function startDragFromBoard(guide, pointerId) {
+          ensureAudio();
+          playPickup();
+          guide.dragging = true;
+          drag = {
+            from: "board",
+            dir: guide.dir,
+            mult: guide.mult,
+            guide,
+            tile: null,
+            pointerId,
+          };
+          window.addEventListener("pointermove", onDragMove);
+          window.addEventListener("pointerup", onDragEnd);
+          showGhost(pointerX, pointerY);
+        }
+
+        let pointerX = 0,
+          pointerY = 0;
+
+        function showGhost(x, y) {
+          pointerX = x;
+          pointerY = y;
+          ghostArrow.textContent = DIRS[drag.dir].glyph;
+          ghost.style.color = DIR_COLORS[drag.dir];
+          ghostMult.style.display = drag.mult > 1 ? "block" : "none";
+          ghostMult.textContent = "×" + drag.mult;
+          ghost.style.left = x + "px";
+          ghost.style.top = y + "px";
+          ghost.style.display = "block";
+        }
+
+        function onDragMove(e) {
+          if (!drag || e.pointerId !== drag.pointerId) return;
+          pointerX = e.clientX;
+          pointerY = e.clientY;
+          ghost.style.left = e.clientX + "px";
+          ghost.style.top = e.clientY + "px";
+          if (isOverCanvas(e.clientX, e.clientY)) {
+            drag.tile = eventToTile(e.clientX, e.clientY);
+          } else {
+            drag.tile = null;
+          }
+        }
+
+        function isOverCanvas(x, y) {
+          const rect = canvas.getBoundingClientRect();
+          return (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+          );
+        }
+
+        function isOverGuideBox(x, y) {
+          const rect = guideBox.getBoundingClientRect();
+          return (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+          );
+        }
+
+        function eventToTile(clientX, clientY) {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = CANVAS / rect.width;
+          const scaleY = CANVAS / rect.height;
+          const x = (clientX - rect.left) * scaleX;
+          const y = (clientY - rect.top) * scaleY;
+          const c = Math.floor(x / cellSize);
+          const r = Math.floor(y / cellSize);
+          if (c < 0 || c >= gridSize || r < 0 || r >= gridSize) return null;
+          return { r, c };
+        }
+
+        function tileFree(t) {
+          return !placedGuides.some(
+            (g) => !g.used && !g.dragging && g.x === t.c && g.y === t.r,
+          );
+        }
+
+        function onDragEnd(e) {
+          if (!drag || e.pointerId !== drag.pointerId) return;
+          const was = drag;
+          drag = null;
+          const overCanvas = isOverCanvas(e.clientX, e.clientY);
+          const overBox = isOverGuideBox(e.clientX, e.clientY);
+
+          if (overCanvas && was.tile && tileFree(was.tile)) {
+            const t = was.tile;
+            if (was.from === "box") {
+              if (!takeFromBox(was.dir, was.mult)) return cleanupDrag();
+              placedGuides.push({
+                dir: was.dir,
+                mult: was.mult,
+                x: t.c,
+                y: t.r,
+                used: false,
+                dragging: false,
+              });
+              playPlace();
+              hintOvershoot(t.c, t.r, was.dir, was.mult);
+            } else if (was.guide) {
+              was.guide.x = t.c;
+              was.guide.y = t.r;
+              was.guide.dragging = false;
+              playPlace();
+              hintOvershoot(t.c, t.r, was.dir, was.mult);
+            }
+          } else if (overBox && was.from === "board" && was.guide) {
+            // drop on the box = return guide (removes from board)
+            placedGuides = placedGuides.filter((g) => g !== was.guide);
+            returnToBox(was.dir, was.mult);
+            showToast("Guide back in the box 📦");
+          } else if (was.guide) {
+            was.guide.dragging = false; // cancelled: stays where it was
+          }
+
+          cleanupDrag();
+          updateStats();
+        }
+
+        function cleanupDrag() {
+          ghost.style.display = "none";
+          window.removeEventListener("pointermove", onDragMove);
+          window.removeEventListener("pointerup", onDragEnd);
+          drag = null;
+        }
+
+        function hintOvershoot(x, y, dir, mult) {
+          const fit = maxHopsFrom(x, y, dir);
+          if (fit < mult) {
+            if (fit === 0) {
+              showToast("💥 Wall right here! Press 🔄 to reset");
+            } else {
+              showToast(
+                `⚠️ Only ${fit} jump${fit === 1 ? "" : "s"} fit from here — press 🔄 to reset`,
+              );
+            }
+          }
+        }
+
+        // ---------- Board drag start (pick up a placed guide) ----------
+        canvas.addEventListener("pointerdown", (e) => {
+          if (runState !== "idle") return;
+          const t = eventToTile(e.clientX, e.clientY);
+          if (!t) return;
+          const gi = placedGuides.findIndex(
+            (g) => !g.used && g.x === t.c && g.y === t.r,
+          );
+          if (gi >= 0) {
+            e.preventDefault();
+            pointerX = e.clientX;
+            pointerY = e.clientY;
+            startDragFromBoard(placedGuides[gi], e.pointerId);
+          }
+        });
+        canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+
+        // ---------- Run execution ----------
+        const HOP_MS = 480;
+
+        function startRun() {
+          if (runState !== "idle") return;
+          ensureAudio();
+          if (atGoal()) return;
+          const available = placedGuides.filter((g) => !g.used);
+          if (available.length === 0) {
+            showToast("Drop a guide first! 🧩");
+            return;
+          }
+          runState = "running";
+          runQueue = available.map((g) => g);
+          nextGuide();
+          stepTimer = setInterval(stepMove, HOP_MS);
+          updateButtons();
+        }
+
+        function nextGuide() {
+          active = runQueue.shift();
+          stepsLeft = active.mult;
+        }
+
+        function stepMove() {
+          if (!active) return;
+          if (!canMove(rabbit.x, rabbit.y, active.dir)) {
+            const dir = active.dir;
+            consumeActive();
+            enterStuck(dir);
+            return;
+          }
+          const d = DIRS[active.dir];
+          rabbit.x += d.dx;
+          rabbit.y += d.dy;
+          hopAnim = { t: 0 };
+          playHop();
+          if (atGoal()) {
+            finishRun(true);
+            return;
+          }
+          stepsLeft--;
+          if (stepsLeft <= 0) {
+            consumeActive();
+            if (runQueue.length === 0) {
+              stopRunner();
+              runState = "idle";
+              bumpFlash = 0;
+              rabbit = { x: 0, y: 0 };
+              updateButtons();
+              showToast(
+                "All guides used! Did bunny get home? Press 🔄 to retry",
+              );
+              return;
+            }
+            nextGuide();
+          }
+        }
+
+        function consumeActive() {
+          if (!active) return;
+          placedGuides = placedGuides.filter((g) => g !== active);
+          // The box count was already decremented when this guide was placed on
+          // the board, so we must NOT touch boxSlots here. Used guides simply
+          // vanish from the maze and never return to the box.
+          active.used = true;
+          active = null;
+        }
+
+        function enterStuck(dir) {
+          if (stepTimer) clearInterval(stepTimer);
+          stepTimer = null;
+          runState = "stuck";
+          stuckDir = dir || null;
+          active = null;
+          stuckTick = 0;
+          bumpFlash = 1;
+          playBump();
+          stuckTimer = setInterval(() => {
+            stuckTick++;
+            bumpFlash = 1;
+            playBump();
+          }, 800);
+          showToast("Oops! Bumped the wall 💥 — press ⏸ to try again");
+          updateButtons();
+        }
+
+        function stopRunner() {
+          if (stepTimer) clearInterval(stepTimer);
+          stepTimer = null;
+          runQueue = [];
+          active = null;
+        }
+
+        function stopStuck() {
+          if (stuckTimer) clearInterval(stuckTimer);
+          stuckTimer = null;
+          stuckDir = null;
+        }
+
+        function pauseRun() {
+          if (runState !== "running" && runState !== "stuck") return;
+          stopRunner();
+          stopStuck();
+          bumpFlash = 0;
+          rabbit = { x: 0, y: 0 };
+          runState = "idle";
+          updateButtons();
+          showToast("Back to start! Rearrange your guides 🧩");
+        }
+
+        function finishRun(won) {
+          stopRunner();
+          stopStuck();
+          if (won) {
+            runState = "won";
+            playWin();
+            launchConfetti();
+            winModal.style.display = "flex";
+          } else {
+            runState = "idle";
+          }
+          updateButtons();
+        }
+
+        // ---------- Hints -------------
+        function expectedPos() {
+          let p = { x: 0, y: 0 };
+          for (const g of placedGuides) {
+            if (g.used || g.dragging) continue;
+            p = simulateGuide(p, g);
+          }
+          return p;
+        }
+
+        function simulateGuide(p, g) {
+          let q = { x: p.x, y: p.y };
+          for (let s = 0; s < g.mult; s++) {
+            if (!canMove(q.x, q.y, g.dir)) break;
+            const d = DIRS[g.dir];
+            q = { x: q.x + d.dx, y: q.y + d.dy };
+            if (atGoalPoint(q)) break;
+          }
+          return q;
+        }
+
+        function getHint() {
+          if (!levelConfig[currentLevel].hints || runState !== "idle")
+            return null;
+
+          // 1. Calculate the starting position after following all valid placed guides
+          let p = { x: 0, y: 0 };
+          for (const g of placedGuides) {
+            if (g.used || g.dragging) continue;
+            p = simulateGuide(p, g);
+          }
+
+          if (atGoalPoint(p)) return { done: true };
+
+          // 2. Find the path from the end position of current guides to the goal
+          const path = bfsPath(p, goal);
+          if (!path || path.length < 2) return null;
+
+          // 3. The hint tile should be where the NEXT guide needs to be placed
+          const nextTile = { r: p.y, c: p.x };
+          const nextDir = path[1].dir;
+
+          return {
+            tile: nextTile,
+            dir: nextDir,
+            path,
+          };
+        }
+
+        // ---------- Toasts / stats ----------
+        let toastTimer = null;
+        function showToast(text) {
+          toast.textContent = text;
+          toast.classList.add("show");
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+        }
+
+        function updateStats() {
+          const s = setupConfig[currentSetup];
+          mapInfoEl.textContent = `🗺️ ${s.emoji} ${s.name} · ${gridSize}×${gridSize}`;
+          const placed = placedGuides.filter((g) => !g.used).length;
+          if (levelConfig[currentLevel].unlimited) {
+            guideInfoEl.textContent = `🧭 ${placed} placed · ∞ left`;
+          } else {
+            guideInfoEl.textContent = `🧭 ${placed} placed · ${guideBoxCount()} left`;
+          }
+        }
+
+        function updateButtons() {
+          playBtn.disabled = runState !== "idle";
+          pauseBtn.disabled = runState !== "running" && runState !== "stuck";
+          guideBox.classList.toggle("locked", runState !== "idle");
+        }
+
+        // ---------- Reset / new game ----------
+        function resetLevel() {
+          stopRunner();
+          stopStuck();
+          bumpFlash = 0;
+          rabbit = { x: 0, y: 0 };
+          placedGuides = [];
+          active = null;
+          runQueue = [];
+          runState = "idle";
+          winModal.style.display = "none";
+          provisionBox();
+          updateStats();
+          updateButtons();
+        }
+
+        function startNewGame() {
+          gridSize = parseInt(mapSizeSel.value, 10) || 6;
+          currentSetup = mapSetupSel.value || "forest";
+          cellSize = CANVAS / gridSize;
+          goal = { x: gridSize - 1, y: gridSize - 1 };
+          generateMaze();
+          resetLevel();
+        }
+
+        // ---------- Buttons ----------
+        playBtn.addEventListener("click", startRun);
+        pauseBtn.addEventListener("click", pauseRun);
+        resetBtn.addEventListener("click", resetLevel);
+        startGameBtn.addEventListener("click", () => {
+          ensureAudio();
+          startNewGame();
+          showToast("New maze! Build your guide path 🧩");
+        });
+
+        document
+          .getElementById("level-selector")
+          .addEventListener("click", (e) => {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+            document
+              .querySelectorAll("#level-selector .btn")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentLevel = parseInt(btn.dataset.level, 10);
+            resetLevel();
+          });
+
+        window.resetGame = function () {
+          resetLevel();
+        };
+
+        // ---------- Confetti ----------
+        function launchConfetti() {
+          const colors = [
+            "#ff9e94",
+            "#ffdf8e",
+            "#bfe8cd",
+            "#cfe6f7",
+            "#e3d0f0",
+            "#ffcfb0",
+            "#f5b464",
+          ];
+          for (let i = 0; i < 40; i++) {
+            const piece = document.createElement("div");
+            piece.className = "confetti-piece";
+            piece.style.left = Math.random() * 100 + "%";
+            piece.style.background =
+              colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDuration = 1.2 + Math.random() * 1.2 + "s";
+            piece.style.animationDelay = Math.random() * 0.4 + "s";
+            gameContainer.appendChild(piece);
+            setTimeout(() => piece.remove(), 3000);
+          }
+        }
+
+        // ---------- Render ----------
+        let rafRunning = false;
+
+        function startLoop() {
+          if (rafRunning) return;
+          rafRunning = true;
+          requestAnimationFrame(loop);
+        }
+
+        function loop() {
+          rabbitDisplay.x += (rabbit.x - rabbitDisplay.x) * 0.18;
+          rabbitDisplay.y += (rabbit.y - rabbitDisplay.y) * 0.18;
+          if (Math.abs(rabbit.x - rabbitDisplay.x) < 0.01)
+            rabbitDisplay.x = rabbit.x;
+          if (Math.abs(rabbit.y - rabbitDisplay.y) < 0.01)
+            rabbitDisplay.y = rabbit.y;
+
+          if (hopAnim) {
+            hopAnim.t += 0.15;
+            if (hopAnim.t >= 1) hopAnim = null;
+          }
+          if (bumpFlash > 0) bumpFlash = Math.max(0, bumpFlash - 0.05);
+
+          draw();
+          requestAnimationFrame(loop);
+        }
+
+        function roundRectPath(x, y, w, h, r) {
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.arcTo(x + w, y, x + w, y + h, r);
+          ctx.arcTo(x + w, y + h, x, y + h, r);
+          ctx.arcTo(x, y + h, x, y, r);
+          ctx.arcTo(x, y, x + w, y, r);
+          ctx.closePath();
+        }
+
+        function drawArrowIcon(cx, cy, size, dir, color) {
+          ctx.save();
+          ctx.translate(cx, cy);
+          const rot =
+            dir === "down"
+              ? Math.PI / 2
+              : dir === "left"
+                ? Math.PI
+                : dir === "up"
+                  ? -Math.PI / 2
+                  : 0;
+          ctx.rotate(rot);
+          const half = size / 2;
+          // shaft
+          ctx.beginPath();
+          ctx.moveTo(-half * 0.62, 0);
+          ctx.lineTo(half * 0.36, 0);
+          ctx.lineWidth = size * 0.3;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = color;
+          ctx.stroke();
+          // head
+          ctx.beginPath();
+          ctx.moveTo(half * 0.5, 0);
+          ctx.lineTo(-half * 0.28, -half * 0.5);
+          ctx.lineTo(-half * 0.28, half * 0.5);
+          ctx.closePath();
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function drawGuideChip(x, y, g, order, isActive) {
+          const cx = g.x * cellSize + cellSize / 2;
+          const cy = g.y * cellSize + cellSize / 2;
+          const cs = cellSize;
+          const chip = cs * 0.8;
+          const color = DIR_COLORS[g.dir];
+
+          if (isActive) {
+            const pulse = 1 + Math.sin(Date.now() / 140) * 0.12;
+            roundRectPath(
+              cx - (chip * pulse) / 2 - 4,
+              cy - (chip * pulse) / 2 - 4,
+              chip * pulse + 8,
+              chip * pulse + 8,
+              16,
+            );
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+          }
+
+          // chip background
+          roundRectPath(cx - chip / 2, cy - chip / 2, chip, chip, chip * 0.28);
+          ctx.fillStyle = "rgba(255,255,255,0.62)";
+          ctx.fill();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = Math.max(3, cs * 0.06);
+          ctx.stroke();
+
+          // arrow
+          drawArrowIcon(cx, cy, chip * 0.6, g.dir, color);
+
+          // order badge (top-left)
+          const bR = chip * 0.2;
+          ctx.beginPath();
+          ctx.arc(
+            cx - chip / 2 + bR + 2,
+            cy - chip / 2 + bR + 2,
+            bR,
+            0,
+            Math.PI * 2,
+          );
+          ctx.fillStyle = "#fff";
+          ctx.fill();
+          ctx.font = `800 ${Math.max(10, bR * 1.25)}px "Baloo 2", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "#c4653f";
+          ctx.fillText(
+            String(order),
+            cx - chip / 2 + bR + 2,
+            cy - chip / 2 + bR + 3,
+          );
+
+          // mult badge (bottom-right)
+          if (g.mult > 1) {
+            const mr = chip * 0.17;
+            ctx.beginPath();
+            ctx.arc(
+              cx + chip / 2 - mr - 2,
+              cy + chip / 2 - mr - 2,
+              mr,
+              0,
+              Math.PI * 2,
+            );
+            ctx.fillStyle = "#ffdf8e";
+            ctx.fill();
+            ctx.font = `800 ${Math.max(9, mr * 1.15)}px "Baloo 2", sans-serif`;
+            ctx.fillStyle = "#7a5520";
+            ctx.fillText(
+              "×" + g.mult,
+              cx + chip / 2 - mr - 2,
+              cy + chip / 2 - mr - 1,
+            );
+          }
+        }
+
+        function draw() {
+          const setup = setupConfig[currentSetup];
+          ctx.clearRect(0, 0, CANVAS, CANVAS);
+
+          // bump flash
+          if (bumpFlash > 0) {
+            ctx.save();
+            ctx.globalAlpha = bumpFlash * 0.25;
+            ctx.fillStyle = "#ff9e94";
+            ctx.fillRect(0, 0, CANVAS, CANVAS);
+            ctx.restore();
+          }
+
+          // subtle checker floor
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              if ((r + c) % 2 === 0) {
+                ctx.fillStyle = "rgba(120, 90, 60, 0.035)";
+                ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+              }
+            }
+          }
+
+          const hint = getHint();
+
+          // hint sparkle path
+          if (hint && hint.path) {
+            ctx.save();
+            ctx.globalAlpha = 0.5;
+            ctx.strokeStyle = "#5cb98a";
+            ctx.lineWidth = Math.max(4, 10 - Math.floor(gridSize / 2));
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.setLineDash([9, 7]);
+            ctx.beginPath();
+            ctx.moveTo(
+              hint.path[0].x * cellSize + cellSize / 2,
+              hint.path[0].y * cellSize + cellSize / 2,
+            );
+            for (let i = 1; i < hint.path.length; i++) {
+              ctx.lineTo(
+                hint.path[i].x * cellSize + cellSize / 2,
+                hint.path[i].y * cellSize + cellSize / 2,
+              );
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // hint next-tile glow
+          if (hint && hint.tile) {
+            const pulse = 0.22 + Math.sin(Date.now() / 250) * 0.1;
+            const hx = hint.tile.c * cellSize;
+            const hy = hint.tile.r * cellSize;
+            roundRectPath(hx + 3, hy + 3, cellSize - 6, cellSize - 6, 14);
+            ctx.fillStyle = `rgba(92, 185, 138, ${pulse})`;
+            ctx.fill();
+            ctx.strokeStyle = "rgba(92, 185, 138, 0.85)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            // direction badge
+            ctx.save();
+            ctx.font = `${cellSize * 0.5}px sans-serif`;
+            ctx.fillStyle = "#5cb98a";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(
+              DIRS[hint.dir].glyph,
+              hx + cellSize / 2,
+              hy + cellSize / 2,
+            );
+            ctx.restore();
+          }
+
+          // "ready" pill when the simulated path reaches home
+          if (hint && hint.done && placedGuides.some((g) => !g.used)) {
+            ctx.save();
+            ctx.font = `800 ${Math.max(14, cellSize * 0.32)}px "Baloo 2", sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const tw = ctx.measureText("▶ Play!").width + 22;
+            roundRectPath(CANVAS / 2 - tw / 2, 8, tw, 30, 15);
+            ctx.fillStyle = "rgba(255, 223, 142, 0.95)";
+            ctx.fill();
+            ctx.strokeStyle = "#e0b554";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = "#7a5520";
+            ctx.fillText("▶ Play!", CANVAS / 2, 24);
+            ctx.restore();
+          }
+
+          // walls
+          ctx.strokeStyle = setup.wallColor;
+          ctx.lineWidth = Math.max(3, 9 - Math.floor(gridSize / 2));
+          ctx.lineCap = "round";
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              const x = c * cellSize;
+              const y = r * cellSize;
+              const cell = maze[r][c];
+              ctx.beginPath();
+              if (cell.walls.top) {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + cellSize, y);
+              }
+              if (cell.walls.right) {
+                ctx.moveTo(x + cellSize, y);
+                ctx.lineTo(x + cellSize, y + cellSize);
+              }
+              if (cell.walls.bottom) {
+                ctx.moveTo(x, y + cellSize);
+                ctx.lineTo(x + cellSize, y + cellSize);
+              }
+              if (cell.walls.left) {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x, y + cellSize);
+              }
+              ctx.stroke();
+            }
+          }
+
+          // goal
+          ctx.save();
+          ctx.font = `${cellSize * 0.65}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(
+            "🏡",
+            goal.x * cellSize + cellSize / 2,
+            goal.y * cellSize + cellSize / 2,
+          );
+          ctx.restore();
+
+          // placed guide chips
+          placedGuides.forEach((g, i) => {
+            if (g.used || g.dragging) return;
+            drawGuideChip(g.x, g.y, g, i + 1, g === active);
+          });
+
+          // drag hover highlight
+          if (drag && drag.tile && tileFree(drag.tile)) {
+            const hx = drag.tile.c * cellSize;
+            const hy = drag.tile.r * cellSize;
+            roundRectPath(hx + 3, hy + 3, cellSize - 6, cellSize - 6, 14);
+            ctx.fillStyle = "rgba(92, 185, 138, 0.3)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(92, 185, 138, 0.9)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          }
+
+          // rabbit
+          ctx.save();
+          const hopLift = hopAnim
+            ? Math.sin(hopAnim.t * Math.PI) * cellSize * 0.28
+            : 0;
+          let rx = rabbitDisplay.x * cellSize + cellSize / 2;
+          let ry = rabbitDisplay.y * cellSize + cellSize / 2 - hopLift;
+
+          if (runState === "stuck" && stuckDir) {
+            const d = DIRS[stuckDir];
+            const wob = Math.sin(Date.now() / 90) * cellSize * 0.16;
+            rx += d.dx * wob;
+            ry += d.dy * wob;
+          }
+
+          ctx.font = `${cellSize * 0.65}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("🐇", rx, ry);
+          ctx.restore();
+        }
+
+        // ---------- Init ----------
+        startNewGame();
+        startLoop();
+      })();
+    </script>
+  </body>
+</html>

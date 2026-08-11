@@ -1,0 +1,27 @@
+{
+  "snippets": [
+    {
+      "name": "force-landscape",
+      "type": "css",
+      "files": { "css": "css/force-landscape.css" },
+      "description": "Full-screen rotate-device overlay shown on portrait orientation.",
+      "dependencies": []
+    },
+    {
+      "name": "typewriter-effect",
+      "type": "js",
+      "files": { "js": "js/typewriter-effect.js" },
+      "description": "Typing/deleting phrase loop for a hero tagline or similar element.",
+      "dependencies": [],
+      "hook": ".js-typewriter"
+    },
+    {
+      "name": "brush-reveal",
+      "type": "css+js",
+      "files": { "css": "css/brush-reveal.css", "js": "js/brush-reveal.js" },
+      "description": "Hover-driven brush effect that wipes away a grayscale overlay to reveal a color image beneath. Multi-instance safe.",
+      "dependencies": [],
+      "hook": ".js-brush-reveal"
+    }
+  ]
+}

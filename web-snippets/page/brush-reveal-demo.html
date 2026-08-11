@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>brush-reveal demo</title>
+<link rel="stylesheet" href="../css/brush-reveal.css" />
+<style>
+  body {
+    background: #111;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .js-brush-reveal {
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  }
+</style>
+</head>
+<body>
+  <!-- Two instances on one page, to show it's multi-instance safe -->
+  <div class="js-brush-reveal"
+       data-grayscale-src="../img/before.png"
+       data-brush-size="60"
+       data-brush-blur="30"
+       data-drying-speed="0.04">
+    <img class="reveal-color-image" src="../img/after.png" alt="Color version">
+    <canvas class="reveal-canvas"></canvas>
+  </div>
+
+  <div class="js-brush-reveal"
+       data-grayscale-src="../img/before.png"
+       data-brush-size="40"
+       data-brush-blur="15"
+       data-drying-speed="0.08">
+    <img class="reveal-color-image" src="../img/after.png" alt="Color version">
+    <canvas class="reveal-canvas"></canvas>
+  </div>
+
+  <script src="../js/brush-reveal.js" defer></script>
+</body>
+</html>

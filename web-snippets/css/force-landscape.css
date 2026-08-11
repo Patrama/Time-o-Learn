@@ -1,0 +1,26 @@
+/**
+ * Landscape Enforcer Overlay
+ * Forces a full-screen "please rotate" message on portrait-oriented screens.
+ *
+ * Usage: just link this stylesheet. No markup or JS required.
+ *
+ * @format
+ */
+
+@media screen and (orientation: portrait) {
+  body::before {
+    content: "🔄 Please rotate your device to Landscape Mode!";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(160deg, #4a3f5c 0%, #6d4f7e 100%);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    z-index: 99999;
+  }
+}

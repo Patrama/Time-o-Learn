@@ -1,12 +1,17 @@
 /**
  * Time-o-Learn — Menu page logic.
  * Plan §4.4 discipline: the entitlement/catalog check fires once per game
- * session (on open), never per in-game interaction. Cards lock immediately on
- * click, show a loading state, and re-enable only after load completes or
- * errors. Result is session-cached in memory (not localStorage).
+ * session — now specifically on the "Play" button inside an expanded card,
+ * never on the initial expand tap (which is pure local UI state, no network
+ * call at all). Play locks immediately, shows a loading state, and
+ * re-enables only after load completes or errors. Result is session-cached
+ * in memory (not localStorage).
  *
- * Adds content-type grouping (Games / Storybooks / All) above the existing
- * badge/category filters, per the index.html redesign.
+ * Tag filtering is OR/union logic: selecting multiple tags shows any game
+ * that has AT LEAST ONE of the selected tags, not only games with all of
+ * them. Tag identity for filtering uses the language-independent slug
+ * (CATALOG.slugifyTag on the English label) so toggling EN/ID doesn't
+ * reset an active filter selection.
  *
  * @format
  */
@@ -16,16 +21,16 @@
 
   var CONFIG = window.APP_CONFIG || {};
   var CLICK_DEBOUNCE_MS = 350;
-  var sessionCache = {}; // in-memory only — never persisted
+  var sessionCache = {};
 
   var state = {
     games: [],
-    groupFilter: "all", // "all" | "game" | "book"
+    groupFilter: "all",
     badgeFilter: "all",
     categoryFilter: "all",
+    tagFilters: new Set(),
   };
 
-  /* ---------- Entitlement (mock — Repo B later) ---------- */
   function checkAccess(gameId) {
     if (sessionCache.hasOwnProperty(gameId)) {
       return Promise.resolve(sessionCache[gameId]);
@@ -39,7 +44,6 @@
     return Promise.resolve(grant);
   }
 
-  /* ---------- Rendering ---------- */
   function el(tag, className, text) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -55,11 +59,24 @@
     return I18N.getLang() === "id" ? game.nameId || game.name : game.name;
   }
 
-  function buildCard(game) {
-    var card = el("button", "game-card");
-    card.type = "button";
-    card.setAttribute("data-game", game.id);
-    card.setAttribute(
+  function gameDescription(game) {
+    return I18N.getLang() === "id"
+      ? game.descriptionId || game.description
+      : game.description;
+  }
+
+  function gameTagLabels(game) {
+    var lang = I18N.getLang();
+    var list =
+      (game.tags && (lang === "id" ? game.tags.id : game.tags.en)) || [];
+    return list;
+  }
+
+  function buildCardHead(game) {
+    var head = el("button", "game-card-toggle");
+    head.type = "button";
+    head.setAttribute("aria-expanded", "false");
+    head.setAttribute(
       "aria-label",
       gameName(game) + " — " + badgeLabel(game.badge),
     );
@@ -99,12 +116,121 @@
     );
     info.appendChild(meta);
 
-    var arrow = el("span", "game-arrow", "→");
+    var arrow = el("span", "game-arrow", "▾");
 
-    card.appendChild(thumb);
-    card.appendChild(info);
-    card.appendChild(arrow);
-    return card;
+    head.appendChild(thumb);
+    head.appendChild(info);
+    head.appendChild(arrow);
+    return head;
+  }
+
+  function buildCardExpanded(game) {
+    var body = el("div", "game-card-expanded");
+    body.hidden = true;
+
+    var mediaWrap = el("div", "game-card-media");
+    if (game.videoUrl) {
+      var video = document.createElement("video");
+      video.className = "game-card-video";
+      video.src = game.videoUrl;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "none";
+      mediaWrap.appendChild(video);
+    } else if (game.thumb) {
+      var img2 = document.createElement("img");
+      img2.className = "game-card-media-img";
+      img2.src = game.thumb;
+      img2.alt = "";
+      img2.loading = "lazy";
+      mediaWrap.appendChild(img2);
+    } else {
+      mediaWrap.classList.add("game-card-media-fallback");
+      mediaWrap.textContent = game.emoji || "🎮";
+    }
+    body.appendChild(mediaWrap);
+
+    var titleRow = el("h3", "game-card-title", gameName(game));
+    body.appendChild(titleRow);
+
+    var tagLabels = gameTagLabels(game);
+    if (tagLabels.length) {
+      var tagRow = el("div", "game-card-tags");
+      tagLabels.forEach(function (label) {
+        tagRow.appendChild(el("span", "tag-pill", label));
+      });
+      body.appendChild(tagRow);
+    }
+
+    var desc = gameDescription(game);
+    if (desc) {
+      body.appendChild(el("p", "game-card-desc", desc));
+    }
+
+    var playBtn = el(
+      "button",
+      "btn-primary game-card-play",
+      I18N.t("game.play"),
+    );
+    playBtn.type = "button";
+    body.appendChild(playBtn);
+
+    return {
+      body: body,
+      playBtn: playBtn,
+      video: mediaWrap.querySelector("video"),
+    };
+  }
+
+  function buildCard(game) {
+    var wrap = el("div", "game-card");
+    wrap.setAttribute("data-game", game.id);
+
+    var head = buildCardHead(game);
+    var expandedParts = buildCardExpanded(game);
+
+    head.addEventListener("click", function () {
+      var isOpen = head.getAttribute("aria-expanded") === "true";
+      document
+        .querySelectorAll(".game-card-toggle[aria-expanded='true']")
+        .forEach(function (other) {
+          if (other !== head) collapseCard(other);
+        });
+      if (isOpen) {
+        collapseCard(head);
+      } else {
+        expandCard(head, expandedParts);
+      }
+    });
+
+    expandedParts.playBtn.addEventListener("click", function () {
+      openGame(game, expandedParts.playBtn, wrap);
+    });
+
+    wrap.appendChild(head);
+    wrap.appendChild(expandedParts.body);
+    return wrap;
+  }
+
+  function expandCard(head, parts) {
+    head.setAttribute("aria-expanded", "true");
+    parts.body.hidden = false;
+    if (parts.video) {
+      parts.video.preload = "auto";
+      parts.video.play().catch(function () {});
+    }
+  }
+
+  function collapseCard(head) {
+    head.setAttribute("aria-expanded", "false");
+    var wrap = head.closest(".game-card");
+    var body = wrap && wrap.querySelector(".game-card-expanded");
+    if (body) {
+      body.hidden = true;
+      var video = body.querySelector("video");
+      if (video) video.pause();
+    }
   }
 
   function matchesFilters(game) {
@@ -126,6 +252,13 @@
     ) {
       return false;
     }
+    if (state.tagFilters.size > 0) {
+      var slugs = game.tagSlugs || [];
+      var hasAny = slugs.some(function (s) {
+        return state.tagFilters.has(s);
+      });
+      if (!hasAny) return false;
+    }
     return true;
   }
 
@@ -137,11 +270,7 @@
     state.games.forEach(function (game) {
       if (!matchesFilters(game)) return;
       visible++;
-      var card = buildCard(game);
-      card.addEventListener("click", function () {
-        openGame(game, card);
-      });
-      grid.appendChild(card);
+      grid.appendChild(buildCard(game));
     });
     updateNoResults(visible === 0);
   }
@@ -152,7 +281,6 @@
     msg.style.display = hidden ? "block" : "none";
   }
 
-  /* ---------- Content-type tabs (Games / Storybooks / All) ---------- */
   function setGroup(group) {
     state.groupFilter = group;
     document
@@ -162,8 +290,8 @@
         tab.classList.toggle("active", active);
         tab.setAttribute("aria-selected", String(active));
       });
-    // Category sidebar/relevance depends on group — rebuild it.
     renderSidebar();
+    renderTagChips();
     renderGrid();
   }
 
@@ -225,6 +353,59 @@
     });
   }
 
+  function toggleTagFilter(slug, chip) {
+    if (state.tagFilters.has(slug)) {
+      state.tagFilters.delete(slug);
+      chip.classList.remove("active");
+      chip.setAttribute("aria-pressed", "false");
+    } else {
+      state.tagFilters.add(slug);
+      chip.classList.add("active");
+      chip.setAttribute("aria-pressed", "true");
+    }
+    renderGrid();
+  }
+
+  function renderTagChips() {
+    var bar = document.querySelector(".tag-bar");
+    if (!bar) return;
+    bar.innerHTML = "";
+
+    var seen = {};
+    state.games.forEach(function (g) {
+      if (
+        state.groupFilter !== "all" &&
+        (g.contentGroup || "game") !== state.groupFilter
+      )
+        return;
+      var labels = gameTagLabels(g);
+      (g.tagSlugs || []).forEach(function (slug, i) {
+        if (!seen[slug]) seen[slug] = labels[i] || slug;
+      });
+    });
+
+    var slugs = Object.keys(seen).sort();
+    if (slugs.length === 0) {
+      bar.hidden = true;
+      return;
+    }
+    bar.hidden = false;
+
+    slugs.forEach(function (slug) {
+      var chip = el("button", "filter-chip tag-chip", seen[slug]);
+      chip.type = "button";
+      chip.setAttribute(
+        "aria-pressed",
+        state.tagFilters.has(slug) ? "true" : "false",
+      );
+      if (state.tagFilters.has(slug)) chip.classList.add("active");
+      chip.addEventListener("click", function () {
+        toggleTagFilter(slug, chip);
+      });
+      bar.appendChild(chip);
+    });
+  }
+
   function renderSidebar() {
     var existing = document.querySelector(".sidebar-filters");
     if (!existing) return;
@@ -260,38 +441,35 @@
     existing.replaceWith(list);
   }
 
-  /* ---------- Open game (§4.4 discipline) ---------- */
   var lastClick = 0;
 
-  function openGame(game, card) {
+  function openGame(game, playBtn, cardWrap) {
     var now = Date.now();
-    if (now - lastClick < CLICK_DEBOUNCE_MS) return; // cheap backstop
+    if (now - lastClick < CLICK_DEBOUNCE_MS) return;
     lastClick = now;
-    if (!card || card.disabled) return;
+    if (!playBtn || playBtn.disabled) return;
 
-    card.disabled = true; // lock immediately
-    card.classList.add("is-loading");
-    card.setAttribute("aria-busy", "true");
+    playBtn.disabled = true;
+    cardWrap.classList.add("is-loading");
+    playBtn.setAttribute("aria-busy", "true");
 
     checkAccess(game.id)
       .then(function (grant) {
         if (!grant.allowed) {
-          // Later phase: open checkout/payment modal here.
-          card.disabled = false;
-          card.classList.remove("is-loading");
-          card.setAttribute("aria-busy", "false");
+          playBtn.disabled = false;
+          cardWrap.classList.remove("is-loading");
+          playBtn.setAttribute("aria-busy", "false");
           return;
         }
         window.location.href = game.path;
       })
       .catch(function () {
-        card.disabled = false;
-        card.classList.remove("is-loading");
-        card.setAttribute("aria-busy", "false");
+        playBtn.disabled = false;
+        cardWrap.classList.remove("is-loading");
+        playBtn.setAttribute("aria-busy", "false");
       });
   }
 
-  /* ---------- States ---------- */
   function showError(online) {
     var msg = document.getElementById("load-error");
     if (!msg) return;
@@ -317,7 +495,6 @@
     if (note) note.classList.add("visible");
   }
 
-  /* ---------- Boot ---------- */
   function bindLangToggle() {
     var toggle = document.getElementById("lang-toggle");
     if (!toggle) return;
@@ -329,6 +506,7 @@
       if (state.games.length) {
         setFilterChips();
         renderSidebar();
+        renderTagChips();
         renderGrid();
       }
     });
@@ -338,11 +516,11 @@
     I18N.initTheme();
     I18N.load()
       .then(function () {
-        I18N.apply(); // static chrome (hero, footer, no-results, etc.)
+        I18N.apply();
         bindLangToggle();
       })
       .catch(function () {
-        bindLangToggle(); // still allow toggle even if dicts fail
+        bindLangToggle();
       });
 
     bindContentTabs();
@@ -354,6 +532,7 @@
         hideError();
         setFilterChips();
         renderSidebar();
+        renderTagChips();
         renderGrid();
         document.body.classList.add("menu-ready");
       })

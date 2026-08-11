@@ -1,217 +1,244 @@
-/** @format */
+/**
+ * Time-o-Learn — Game catalog loader.
+ * Plan §5.1/§5.4: /api/catalog (Vercel) returns only menu fields; on failure
+ * falls back to cached last-known catalog in localStorage. A minimal static
+ * seed keeps the menu functional on pure GitHub Pages with no Repo B yet.
+ *
+ * IMPORTANT: normalize() must match the REAL /api/catalog response shape
+ * (see Repo B api/catalog.js shapeCatalog()):
+ *   { id, title: {en, id}, description: {en, id}, thumbnail,
+ *     ageRange, category, priceRental, priceCurrency, isFreeTrial,
+ *     contentType }
+ * badge and ageMin/ageMax are DERIVED here — the API does not send them.
+ *
+ * PATH CONVENTION (confirmed against the real repo tree):
+ *   game            -> page/game-content/<id>/<id>.html
+ *   book_interactive -> page/book-content/interactive/<id>/<id>.html
+ *   book_static      -> page/book-content/static/<id>/<id>.html
+ * This requires a `content_type` column on the Catalog sheet
+ * (values: game | book_interactive | book_static). Existing game rows
+ * (snake-stack, snake-block, matching-block, text-to-image) need this
+ * column set to "game".
+ *
+ * @format
+ */
 
-// /api/catalog — game catalog + pricing for the public menu.
-//
-// Fetches two published Google Sheet CSVs (Catalog, Pricing) server-side,
-// parses them, caches in-memory for CACHE_TTL_MS, and returns only the
-// fields the menu needs. Env: SHEET_CATALOG_CSV_URL, SHEET_PRICING_CSV_URL.
-//
-// Cache is per-function-instance (resets on cold start) — this is expected
-// and fine at this scale; it avoids re-fetching Sheets on every request
-// without needing a separate cache store.
+(function () {
+  "use strict";
 
-import { applyCors, isPreflight, sendJson } from "../lib/cors.js";
+  var CONFIG = window.APP_CONFIG || {};
+  var FALLBACK_CACHE_KEY = "tol_catalog_v1";
 
-const CACHE_TTL_MS = 8 * 60 * 1000; // ~8 min, within the 5–10 min window from the plan
+  var SEED = [
+    {
+      id: "snake",
+      name: "Snake",
+      nameId: "Ular",
+      description: "Classic snake — grow by eating, don't hit the walls.",
+      descriptionId:
+        "Ular klasik — makan agar panjang, jangan menabrak dinding.",
+      category: "classic",
+      contentType: "game",
+      ageMin: 4,
+      ageMax: 10,
+      badge: "trial",
+      path: "page/game-content/snake/index.html",
+      emoji: "🐍",
+      thumb: "",
+      featured: true,
+    },
+  ];
 
-let cache = {
-  data: null, // { games, pricing }
-  fetchedAt: 0, // epoch ms
-};
+  /** Derive a display badge from price/trial fields (API doesn't send one). */
+  function deriveBadge(g) {
+    if (g.isFreeTrial) return "trial";
+    var price = Number(g.priceRental);
+    if (!price || price <= 0) return "free";
+    return "rental";
+    // "subscription" badge is assigned by the Pricing-tab-driven all-access
+    // flow, not per-game — not derivable from catalog rows alone.
+  }
 
-// --- Minimal CSV parser (no dependency) -----------------------------------
-// Handles quoted fields, commas inside quotes, and escaped "" quotes.
-// Google Sheets' CSV export follows standard RFC 4180 quoting, which this covers.
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let field = "";
-  let inQuotes = false;
+  /** Parse "4-7" -> {min:4, max:7}. Falls back to a wide-open range. */
+  function parseAgeRange(rangeStr) {
+    var m = String(rangeStr || "").match(/(\d+)\s*-\s*(\d+)/);
+    if (!m) return { min: 0, max: 99 };
+    return { min: Number(m[1]), max: Number(m[2]) };
+  }
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const next = text[i + 1];
-
-    if (inQuotes) {
-      if (char === '"' && next === '"') {
-        field += '"';
-        i++;
-      } else if (char === '"') {
-        inQuotes = false;
-      } else {
-        field += char;
-      }
-    } else {
-      if (char === '"') {
-        inQuotes = true;
-      } else if (char === ",") {
-        row.push(field);
-        field = "";
-      } else if (char === "\n" || char === "\r") {
-        // Handle \r\n and bare \n; skip the paired \n after \r
-        if (char === "\r" && next === "\n") i++;
-        row.push(field);
-        rows.push(row);
-        row = [];
-        field = "";
-      } else {
-        field += char;
-      }
+  /**
+   * Path convention matching the real page/ tree. Every game/book folder
+   * contains an index.html (standard convention — the folder name IS the
+   * id, so the file doesn't need to repeat it):
+   *   game             -> page/game-content/<id>/index.html
+   *   book_interactive -> page/book-content/interactive/<id>/index.html
+   *   book_static      -> page/book-content/static/<id>/index.html
+   * Unknown/missing content_type defaults to "game" (today's only type).
+   */
+  function defaultPath(id, contentType) {
+    switch (contentType) {
+      case "book_interactive":
+        return "page/book-content/interactive/" + id + "/index.html";
+      case "book_static":
+        return "page/book-content/static/" + id + "/index.html";
+      case "game":
+      default:
+        return "page/game-content/" + id + "/index.html";
     }
   }
-  // Final field/row if the file doesn't end with a newline
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    rows.push(row);
+
+  /** Content-type label, used for menu section grouping. */
+  function deriveContentGroup(contentType) {
+    if (contentType === "book_interactive" || contentType === "book_static") {
+      return "book";
+    }
+    return "game";
   }
 
-  return rows.filter((r) => r.length > 1 || (r.length === 1 && r[0] !== ""));
-}
-
-function rowsToObjects(rows) {
-  if (rows.length === 0) return [];
-  const headers = rows[0].map((h) => h.trim());
-  return rows.slice(1).map((r) => {
-    const obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = (r[i] ?? "").trim();
-    });
-    return obj;
-  });
-}
-
-async function fetchCsv(url) {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`csv_fetch_failed:${res.status}`);
-  }
-  const text = await res.text();
-  return rowsToObjects(parseCsv(text));
-}
-
-function toBool(value) {
-  return String(value).trim().toUpperCase() === "TRUE";
-}
-
-function toNumber(value, fallback = 0) {
-  // Sheets' Publish-to-web CSV export can carry display formatting through
-  // (e.g. "10,000" or "Rp 10.000") depending on locale/number-format
-  // settings — strip everything except digits and a leading minus sign
-  // before parsing, since prices here are always whole numbers (no cents).
-  const cleaned = String(value)
-    .trim()
-    .replace(/[^0-9-]/g, "");
-  const n = Number(cleaned);
-  return Number.isFinite(n) && cleaned !== "" ? n : fallback;
-}
-
-// --- Shape the raw sheet rows into the light payload the menu needs -------
-function shapeCatalog(rawRows) {
-  return rawRows
-    .filter((row) => toBool(row.active))
-    .map((row) => ({
-      id: row.id,
-      title: { en: row.title_en, id: row.title_id },
-      description: { en: row.description_en, id: row.description_id },
-      thumbnail: row.thumbnail,
-      ageRange: row.age_range,
-      category: row.category,
-      priceRental: toNumber(row.price_rental),
-      priceCurrency: row.price_currency || "IDR",
-      isFreeTrial: toBool(row.is_free_trial),
-      contentType: row.content_type || "game",
-    }))
-    .filter((game) => game.id); // drop any blank/malformed rows
-}
-
-function shapePricing(rawRows) {
-  return rawRows
-    .map((row) => ({
-      planId: row.plan_id,
-      label: { en: row.label_en, id: row.label_id },
-      price: toNumber(row.price),
-      durationDays: toNumber(row.duration_days),
-      installmentsAllowed: toBool(row.installments_allowed),
-    }))
-    .filter((plan) => plan.planId);
-}
-
-async function loadCatalogAndPricing() {
-  const catalogUrl = process.env.SHEET_CATALOG_CSV_URL;
-  const pricingUrl = process.env.SHEET_PRICING_CSV_URL;
-
-  // Catalog is required — without it there's nothing to show.
-  if (!catalogUrl) {
-    throw new Error("missing_catalog_env_var");
+  /** Lowercase, hyphenated key used for filter matching regardless of
+   *  active language — derived from the EN tag label, e.g.
+   *  "Problem Solving" -> "problem-solving". */
+  function slugifyTag(label) {
+    return String(label || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
-  // Pricing is OPTIONAL — the Pricing tab/sheet may not exist yet (e.g.
-  // subscription plans built in a later phase). Catalog must still load
-  // and games must still display even with no pricing configured.
-  const catalogPromise = fetchCsv(catalogUrl);
-  const pricingPromise = pricingUrl
-    ? fetchCsv(pricingUrl).catch(() => [])
-    : Promise.resolve([]);
+  function normalize(raw) {
+    if (!Array.isArray(raw) || raw.length === 0) return null;
+    return raw
+      .filter(function (g) {
+        return g && g.id;
+      })
+      .map(function (g) {
+        // Support BOTH the real API shape (title.en/title.id objects) and
+        // the old flat-seed shape (name/nameId strings).
+        var titleEn = (g.title && g.title.en) || g.name || g.id;
+        var titleId = (g.title && g.title.id) || g.nameId || titleEn;
+        var descEn =
+          (g.description && g.description.en) ||
+          (typeof g.description === "string" ? g.description : "") ||
+          "";
+        var descId =
+          (g.description && g.description.id) || g.descriptionId || descEn;
 
-  const [catalogRows, pricingRows] = await Promise.all([
-    catalogPromise,
-    pricingPromise,
-  ]);
+        var ages = g.ageRange
+          ? parseAgeRange(g.ageRange)
+          : { min: Number(g.ageMin) || 0, max: Number(g.ageMax) || 99 };
 
-  return {
-    games: shapeCatalog(catalogRows),
-    pricing: shapePricing(pricingRows),
-  };
-}
+        var contentType = g.contentType || g.content_type || "game";
 
-export default async function handler(req, res) {
-  applyCors(req, res);
-  if (isPreflight(req)) {
-    return sendJson(res, 204, {});
+        var tagsEn = (g.tags && g.tags.en) || [];
+        var tagsId = (g.tags && g.tags.id) || tagsEn;
+        var tagSlugs = tagsEn.map(slugifyTag);
+
+        return {
+          id: g.id,
+          name: titleEn,
+          nameId: titleId,
+          description: descEn,
+          descriptionId: descId,
+          category: g.category || "other",
+          contentType: contentType,
+          contentGroup: deriveContentGroup(contentType),
+          ageMin: ages.min,
+          ageMax: ages.max,
+          badge: g.badge || deriveBadge(g),
+          priceRental: Number(g.priceRental) || 0,
+          priceCurrency: g.priceCurrency || "IDR",
+          path: g.path || defaultPath(g.id, contentType),
+          emoji:
+            g.emoji ||
+            (deriveContentGroup(contentType) === "book" ? "📖" : "🎮"),
+          thumb: g.thumb || g.thumbnail || "",
+          videoUrl: g.videoUrl || g.video_url || "",
+          // tags.en/id are display labels (by index, same order); tagSlugs
+          // is the language-independent filter key derived from the EN label.
+          tags: { en: tagsEn, id: tagsId },
+          tagSlugs: tagSlugs,
+          featured: !!g.featured || !!g.isFreeTrial,
+        };
+      });
   }
 
-  if (req.method !== "GET") {
-    return sendJson(res, 405, { ok: false, error: "method_not_allowed" });
+  function readCache() {
+    try {
+      var raw = localStorage.getItem(FALLBACK_CACHE_KEY);
+      if (!raw) return null;
+      return normalize(JSON.parse(raw));
+    } catch (e) {
+      return null;
+    }
   }
 
-  const now = Date.now();
-  const cacheIsFresh = cache.data && now - cache.fetchedAt < CACHE_TTL_MS;
-  const forceRefresh = req.query?.refresh === "1";
-
-  if (cacheIsFresh && !forceRefresh) {
-    return sendJson(res, 200, {
-      ok: true,
-      cached: true,
-      cachedAt: cache.fetchedAt,
-      ...cache.data,
-    });
+  function writeCache(games) {
+    try {
+      localStorage.setItem(FALLBACK_CACHE_KEY, JSON.stringify(games));
+    } catch (e) {
+      /* storage full/unavailable — ignore */
+    }
   }
 
-  try {
-    const data = await loadCatalogAndPricing();
-    cache = { data, fetchedAt: now };
-    return sendJson(res, 200, {
-      ok: true,
-      cached: false,
-      cachedAt: now,
-      ...data,
-    });
-  } catch (err) {
-    // Graceful degradation: if we have any stale cache, serve it rather than
-    // erroring out completely — matches the plan's §5.4 resilience principle.
-    if (cache.data) {
-      return sendJson(res, 200, {
-        ok: true,
-        cached: true,
-        stale: true,
-        cachedAt: cache.fetchedAt,
-        ...cache.data,
+  function gamesAreEqual(a, b) {
+    if (!a || !b || a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].id !== b[i].id) return false;
+    }
+    return true;
+  }
+
+  function fromApi() {
+    var url = (CONFIG.apiBaseUrl || "").replace(/\/$/, "") + "/api/catalog";
+    return fetch(url, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("catalog http " + res.status);
+        return res.json();
+      })
+      .then(function (json) {
+        var games = normalize(json.games || json);
+        if (!games) throw new Error("catalog empty");
+        var prev = readCache();
+        if (!gamesAreEqual(prev, games)) writeCache(games);
+        return { games: games, online: true };
+      });
+  }
+
+  function fromSeed() {
+    return { games: SEED, online: false };
+  }
+
+  function fromCache() {
+    var games = readCache();
+    return games ? { games: games, online: false } : null;
+  }
+
+  /** Load catalog: API → localStorage cache → static seed. */
+  function load() {
+    if (CONFIG.features && CONFIG.features.catalogCacheFallback === false) {
+      return fromApi().catch(function () {
+        return fromSeed();
       });
     }
-    return sendJson(res, 502, {
-      ok: false,
-      error: "catalog_fetch_failed",
-      message: err.message,
-    });
+    return fromApi().then(
+      function (result) {
+        return result;
+      },
+      function () {
+        var cached = fromCache();
+        return cached || fromSeed();
+      },
+    );
   }
-}
+
+  window.CATALOG = {
+    load: load,
+    seed: SEED,
+    slugifyTag: slugifyTag,
+    _normalize: normalize,
+    _deriveBadge: deriveBadge,
+    _parseAgeRange: parseAgeRange,
+    _defaultPath: defaultPath,
+  };
+})();

@@ -1,0 +1,32 @@
+/**
+ * Brush Reveal
+ * A container that holds a color image + canvas; hovering "wipes" a
+ * grayscale overlay away to reveal the color image underneath.
+ *
+ * Usage: wrap your <img> + <canvas> in a `.js-brush-reveal` container.
+ * Set --reveal-aspect-ratio inline if your photo isn't 16/9.
+ *
+ * @format
+ */
+
+.js-brush-reveal {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--reveal-aspect-ratio, 16 / 9);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.js-brush-reveal .reveal-color-image,
+.js-brush-reveal .reveal-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.js-brush-reveal .reveal-canvas {
+    z-index: 2;
+}
