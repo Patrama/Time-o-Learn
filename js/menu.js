@@ -127,7 +127,7 @@
     head.appendChild(thumb);
     head.appendChild(info);
     head.appendChild(arrow);
-    return head;
+    return { head: head, playBtn: playOverlay };
   }
 
   function buildCardExpanded(game) {
@@ -186,8 +186,10 @@
     var wrap = el("div", "game-card");
     wrap.setAttribute("data-game", game.id);
 
-    var head = buildCardHead(game);
+    var headParts = buildCardHead(game);
+    var head = headParts.head;
     var expandedParts = buildCardExpanded(game);
+    expandedParts.playBtn = headParts.playBtn;
 
     head.addEventListener("click", function () {
       var isOpen = head.getAttribute("aria-expanded") === "true";
