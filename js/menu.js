@@ -128,6 +128,17 @@
     var body = el("div", "game-card-expanded");
     body.hidden = true;
 
+    // Play goes FIRST — right after the always-visible header, before any
+    // media/tags/description — so it's reachable without scrolling
+    // regardless of how long a game's description ends up being.
+    var playBtn = el(
+      "button",
+      "btn-primary game-card-play",
+      I18N.t("game.play"),
+    );
+    playBtn.type = "button";
+    body.appendChild(playBtn);
+
     var mediaWrap = el("div", "game-card-media");
     if (game.videoUrl) {
       var video = document.createElement("video");
@@ -167,14 +178,6 @@
     if (desc) {
       body.appendChild(el("p", "game-card-desc", desc));
     }
-
-    var playBtn = el(
-      "button",
-      "btn-primary game-card-play",
-      I18N.t("game.play"),
-    );
-    playBtn.type = "button";
-    body.appendChild(playBtn);
 
     return {
       body: body,
