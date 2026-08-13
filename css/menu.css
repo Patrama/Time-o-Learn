@@ -693,3 +693,65 @@
     aspect-ratio: 21 / 9;
   }
 }
+
+/* ---------- Play overlay on header thumbnail (shown when expanded) ---------- */
+.game-card-toggle .game-thumb {
+  position: relative;
+}
+
+.game-card-toggle .game-card-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 2.5rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  pointer-events: none;
+}
+
+/* Show play overlay constantly visible when expanded */
+.game-card-toggle[aria-expanded="true"] .game-card-play-overlay {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+
+.game-card-toggle[aria-expanded="true"] .game-card-play-overlay:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.game-card-toggle[aria-expanded="true"] .game-card-play-overlay:active {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(0.95);
+}
+
+/* Fallback sizing for play overlay when no image (emoji fallback) */
+.game-card-toggle .game-thumb-fallback + .game-card-play-overlay {
+  font-size: 1.6rem;
+}
+
+/* ---------- Card head swap when expanded: thumb right, info left ---------- */
+.game-card-toggle[aria-expanded="true"] {
+  flex-direction: row-reverse;
+}
+
+.game-card-toggle[aria-expanded="true"] .game-info {
+  text-align: right;
+}
+
+.game-card-toggle[aria-expanded="true"] .game-meta {
+  justify-content: flex-end;
+}
+
+/* ---------- Hide arrow when expanded ---------- */
+.game-card-toggle[aria-expanded="true"] .game-arrow {
+  display: none;
+}

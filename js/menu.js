@@ -100,6 +100,12 @@
       thumb.textContent = game.emoji || "🎮";
     }
 
+    // Play overlay on header thumbnail (shown when expanded)
+    var playOverlay = el("button", "game-card-play-overlay", "▶");
+    playOverlay.type = "button";
+    playOverlay.setAttribute("aria-label", I18N.t("game.play"));
+    thumb.appendChild(playOverlay);
+
     var info = el("div", "game-info");
     info.appendChild(el("div", "game-name", gameName(game)));
     var meta = el("div", "game-meta");
@@ -128,17 +134,6 @@
     var body = el("div", "game-card-expanded");
     body.hidden = true;
 
-    // Play goes FIRST — right after the always-visible header, before any
-    // media/tags/description — so it's reachable without scrolling
-    // regardless of how long a game's description ends up being.
-    var playBtn = el(
-      "button",
-      "btn-primary game-card-play",
-      I18N.t("game.play"),
-    );
-    playBtn.type = "button";
-    body.appendChild(playBtn);
-
     var mediaWrap = el("div", "game-card-media");
     if (game.videoUrl) {
       var video = document.createElement("video");
@@ -162,9 +157,6 @@
     }
     body.appendChild(mediaWrap);
 
-    var titleRow = el("h3", "game-card-title", gameName(game));
-    body.appendChild(titleRow);
-
     var tagLabels = gameTagLabels(game);
     if (tagLabels.length) {
       var tagRow = el("div", "game-card-tags");
@@ -178,6 +170,10 @@
     if (desc) {
       body.appendChild(el("p", "game-card-desc", desc));
     }
+
+    // Play button is on the header thumbnail; find it from the toggle
+    var head = body.previousElementSibling;
+    var playBtn = head && head.querySelector(".game-card-play-overlay");
 
     return {
       body: body,
