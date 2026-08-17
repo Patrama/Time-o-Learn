@@ -75,6 +75,25 @@
   white-space: nowrap;
 }
 
+/* Header actions (theme + language toggles, top bar right) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+}
+
+/* Theme toggle (top bar right) */
+.theme-toggle .theme-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.theme-toggle .theme-code {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* Language toggle (top bar right) */
 .lang-toggle {
   flex: none;

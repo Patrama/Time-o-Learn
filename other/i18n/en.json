@@ -63,6 +63,12 @@
   "lang": {
     "label": "Language"
   },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
   "footer": {
     "rights": "Made with care for little learners."
   }

@@ -124,7 +124,13 @@
     });
   }
 
-  /* -------- Theme helper (plan §1 UI considerations) -------- */
+  /* -------- Theme helper --------
+     Three states: "system" (default — no attribute, CSS media query
+     decides live), "light" and "dark" (explicit overrides persisted in
+     localStorage, restored pre-paint by the inline script in index.html
+     to avoid a flash of the wrong colors). */
+  var THEME_STATES = ["system", "light", "dark"];
+
   function applyTheme(pref) {
     var html = document.documentElement;
     if (pref === "light" || pref === "dark") {
@@ -134,14 +140,53 @@
     }
   }
 
-  function initTheme() {
+  function getTheme() {
     var saved = null;
     try {
       saved = localStorage.getItem(THEME_KEY);
     } catch (e) {
       /* ignore */
     }
-    applyTheme(saved);
+    return saved === "light" || saved === "dark" ? saved : "system";
+  }
+
+  function setTheme(pref) {
+    if (THEME_STATES.indexOf(pref) === -1) pref = "system";
+    try {
+      if (pref === "system") {
+        localStorage.removeItem(THEME_KEY);
+      } else {
+        localStorage.setItem(THEME_KEY, pref);
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    applyTheme(pref);
+  }
+
+  function toggleTheme() {
+    var next =
+      THEME_STATES[(THEME_STATES.indexOf(getTheme()) + 1) % THEME_STATES.length];
+    setTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    applyTheme(getTheme());
+    /* Live OS follow: while pref is "system" the attribute is simply
+       absent, so CSS `@media (prefers-color-scheme: dark)` tracks the OS
+       by itself. The listener re-applies on change for safety. */
+    if (window.matchMedia) {
+      var mq = window.matchMedia("(prefers-color-scheme: dark)");
+      var onSchemeChange = function () {
+        applyTheme(getTheme());
+      };
+      if (typeof mq.addEventListener === "function") {
+        mq.addEventListener("change", onSchemeChange);
+      } else if (typeof mq.addListener === "function") {
+        mq.addListener(onSchemeChange);
+      }
+    }
   }
 
   window.I18N = {
@@ -154,6 +199,10 @@
     setLang: setLang,
     initTheme: initTheme,
     applyTheme: applyTheme,
+    getTheme: getTheme,
+    setTheme: setTheme,
+    toggleTheme: toggleTheme,
+    THEME_STATES: THEME_STATES,
     STORAGE_KEY: STORAGE_KEY,
     THEME_KEY: THEME_KEY,
   };

@@ -496,6 +496,32 @@
     if (note) note.classList.add("visible");
   }
 
+  function renderThemeToggle(toggle) {
+    var state = I18N.getTheme();
+    var meta = {
+      system: { icon: "🖥️", key: "theme.system" },
+      light: { icon: "☀️", key: "theme.light" },
+      dark: { icon: "🌙", key: "theme.dark" },
+    };
+    toggle.querySelector(".theme-icon").textContent = meta[state].icon;
+    toggle.querySelector(".theme-code").textContent = I18N.t(meta[state].key);
+    toggle.setAttribute("aria-label", I18N.t(meta[state].key));
+  }
+
+  function bindThemeToggle() {
+    var toggle = document.getElementById("theme-toggle");
+    if (!toggle) return;
+    renderThemeToggle(toggle);
+    toggle.addEventListener("click", function () {
+      I18N.toggleTheme();
+      renderThemeToggle(toggle);
+    });
+    // Keep the button label in sync when the language changes.
+    I18N.onChange(function () {
+      renderThemeToggle(toggle);
+    });
+  }
+
   function bindLangToggle() {
     var toggle = document.getElementById("lang-toggle");
     if (!toggle) return;
@@ -519,9 +545,11 @@
       .then(function () {
         I18N.apply();
         bindLangToggle();
+        bindThemeToggle();
       })
       .catch(function () {
         bindLangToggle();
+        bindThemeToggle();
       });
 
     bindContentTabs();

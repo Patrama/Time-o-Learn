@@ -13,6 +13,22 @@
       content="Time-o-Learn — fun learning games and storybooks for toddlers and elementary kids. Works on any phone, even on slow connections."
     />
     <title>Time-o-Learn</title>
+    <script>
+      /* Theme pre-paint: restore a saved light/dark override before the first
+         render so there is no flash of the wrong colors. No attribute = System
+         mode → CSS `@media (prefers-color-scheme: dark)` decides, with light
+         as the fallback when detection is unavailable (REQ-002/003/008). */
+      (function () {
+        try {
+          var saved = localStorage.getItem("tol_theme");
+          if (saved === "light" || saved === "dark") {
+            document.documentElement.setAttribute("data-theme", saved);
+          }
+        } catch (e) {
+          /* storage unavailable — keep System mode */
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/menu.css" />
     <script src="other/config.js"></script>
@@ -27,17 +43,30 @@
         <span class="brand-logo" aria-hidden="true">TL</span>
         <span class="brand-name" data-i18n="meta.siteName">Time-o-Learn</span>
       </div>
-      <button
-        id="lang-toggle"
-        class="lang-toggle"
-        type="button"
-        data-i18n-attr="aria-label"
-        data-i18n="lang.label"
-        aria-label="Language"
-      >
-        <span class="lang-dot" aria-hidden="true">🌐</span>
-        <span class="lang-code">EN</span>
-      </button>
+      <div class="header-actions">
+        <button
+          id="theme-toggle"
+          class="lang-toggle theme-toggle"
+          type="button"
+          data-i18n-attr="aria-label"
+          data-i18n="theme.label"
+          aria-label="Theme"
+        >
+          <span class="theme-icon" aria-hidden="true">☀️</span>
+          <span class="theme-code">System</span>
+        </button>
+        <button
+          id="lang-toggle"
+          class="lang-toggle"
+          type="button"
+          data-i18n-attr="aria-label"
+          data-i18n="lang.label"
+          aria-label="Language"
+        >
+          <span class="lang-dot" aria-hidden="true">🌐</span>
+          <span class="lang-code">EN</span>
+        </button>
+      </div>
     </header>
 
     <main class="app-main">

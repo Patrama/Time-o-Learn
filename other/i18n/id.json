@@ -63,6 +63,12 @@
   "lang": {
     "label": "Bahasa"
   },
+  "theme": {
+    "label": "Tema",
+    "system": "Sistem",
+    "light": "Terang",
+    "dark": "Gelap"
+  },
   "footer": {
     "rights": "Dibuat dengan penuh perhatian untuk para pembelajar cilik."
   }
