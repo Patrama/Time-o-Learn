@@ -755,3 +755,234 @@
 .game-card-toggle[aria-expanded="true"] .game-arrow {
   display: none;
 }
+
+/* ============================================================
+   Claymorphism (70%) + Glassmorphism (30%) fusion redesign
+   Appended overlay — component-role blend, same token set.
+   Glass (30%): header, content tabs, filter chips, sidebar,
+   tag chips, lang toggle.
+   Clay (70%): game cards, hero kicker, badges, brand logo,
+   buttons, thumbnails, media well.
+   ============================================================ */
+
+/* Page backdrop — soft radial washes give the glass layers
+   something colorful to blur (glass only reads as glass
+   when there is depth behind it). */
+body {
+  background:
+    radial-gradient(
+      1200px 600px at 15% -10%,
+      color-mix(in srgb, var(--brand-soft) 70%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      1000px 520px at 110% 8%,
+      color-mix(in srgb, var(--accent-soft) 55%, transparent),
+      transparent 55%
+    ),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
+/* ---------- Glass surfaces (shared) ---------- */
+.app-header,
+.lang-toggle,
+.content-tab,
+.filter-chip,
+.sidebar-filters,
+.sidebar-chip,
+.tag-chip {
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.app-header {
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow:
+    0 1px 0 var(--glass-shine) inset,
+    0 8px 24px color-mix(in srgb, var(--clay-shadow-color) 40%, transparent);
+}
+
+.lang-toggle {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  box-shadow: 0 1px 0 var(--glass-shine) inset;
+}
+
+.content-tab,
+.filter-chip {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  box-shadow: 0 1px 0 var(--glass-shine) inset;
+}
+
+/* Active chips / tabs switch to clay (filled + slightly pressed) */
+.content-tab.active,
+.filter-chip.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-contrast);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+.tag-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+/* ---------- Sidebar (desktop frosted panel) ---------- */
+@media (min-width: 900px) {
+  .sidebar-filters {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-chunk);
+    padding: 0.9rem;
+    box-shadow: 0 1px 0 var(--glass-shine) inset;
+  }
+
+  .sidebar-title {
+    padding-inline: 0.2rem;
+  }
+
+  .sidebar-chip {
+    background: var(--glass-bg-strong);
+    border-color: var(--glass-border);
+    border-radius: var(--radius-chunk-sm);
+    box-shadow: 0 1px 0 var(--glass-shine) inset;
+  }
+
+  .sidebar-chip.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: var(--brand-contrast);
+    box-shadow: var(--clay-shadow-sm);
+  }
+}
+
+/* ---------- Clay surfaces ---------- */
+
+/* Brand logo — clay tile */
+.brand-logo {
+  border-radius: var(--radius-chunk-sm);
+  border: 1px solid var(--glass-shine);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+/* Hero kicker — clay pill */
+.hero-kicker {
+  border: 1px solid var(--glass-shine);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+/* Game cards — chunky clay blocks */
+.game-card {
+  border-radius: var(--radius-chunk);
+  border: 1px solid var(--glass-shine);
+  background: var(--surface);
+  box-shadow: var(--clay-shadow-md);
+}
+
+.game-card.is-loading {
+  box-shadow: var(--clay-shadow-sm);
+}
+
+.game-card:active {
+  transform: scale(0.98);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+.game-card-toggle .game-thumb {
+  border-radius: var(--radius-chunk-sm);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+.game-card-toggle[aria-expanded="true"] .game-thumb {
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+/* Expanded media — inset clay well */
+.game-card-media {
+  border-radius: var(--radius-chunk-sm);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+.game-card-expanded {
+  border-top: 1px solid var(--glass-border);
+}
+
+.game-card-play-overlay {
+  border-radius: var(--radius-chunk-sm);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* Badges + tag pills — soft clay pills */
+.badge,
+.tag-pill {
+  box-shadow:
+    0 1px 0 var(--clay-highlight) inset,
+    0 2px 0 var(--clay-shadow-color);
+}
+
+/* Buttons — clay buttons */
+.retry-btn,
+.game-card-play {
+  box-shadow: var(--clay-shadow-sm);
+  border-radius: var(--radius-full);
+}
+
+.retry-btn {
+  border: 1px solid var(--glass-shine);
+}
+
+/* Offline note — clay tint pill */
+.offline-note {
+  border: 1px solid var(--glass-shine);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+/* ---------- Motion: hover lift (fine pointers only) ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .game-card:hover:not(.is-loading) {
+    transform: translateY(-4px);
+    box-shadow: var(--clay-shadow-hover);
+  }
+
+  .retry-btn:hover,
+  .game-card-play:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--clay-shadow-md);
+  }
+}
+
+/* Pressed state flattens the clay */
+.retry-btn:active,
+.game-card-play:active {
+  transform: translateY(2px);
+  box-shadow: var(--clay-shadow-pressed);
+}
+
+/* Smooth everything through the same motion language */
+.content-tab,
+.filter-chip,
+.sidebar-chip,
+.tag-chip,
+.lang-toggle,
+.retry-btn,
+.game-card-play {
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.12s ease;
+}

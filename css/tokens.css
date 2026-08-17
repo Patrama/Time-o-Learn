@@ -94,6 +94,8 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.38);
     --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+
+    --clay-shadow-color: rgba(0, 0, 0, 0.45);
   }
 }
 
@@ -138,6 +140,8 @@ html[data-theme="light"] {
   --shadow-sm: 0 1px 2px rgba(12, 36, 52, 0.08);
   --shadow-md: 0 6px 16px rgba(12, 36, 52, 0.1);
   --shadow-lg: 0 16px 32px rgba(12, 36, 52, 0.16);
+
+  --clay-shadow-color: rgba(12, 36, 52, 0.22);
 }
 
 html[data-theme="dark"] {
@@ -180,6 +184,8 @@ html[data-theme="dark"] {
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.38);
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+
+  --clay-shadow-color: rgba(0, 0, 0, 0.45);
 }
 
 /* ---------- Semantic tokens ---------- */
@@ -215,6 +221,35 @@ html[data-theme="dark"] {
   --header-h: 56px;
   --content-max: 1180px;
   --tap-target: 48px;
+}
+
+/* ---------- Clay & glass recipes (fusion: 70% clay / 30% glass) ---------- */
+:root {
+  --clay-shadow-color: rgba(12, 36, 52, 0.22);
+  --clay-highlight: rgba(255, 255, 255, 0.55);
+  --clay-shadow-sm:
+    0 1px 0 var(--clay-highlight) inset,
+    0 4px 0 var(--clay-shadow-color);
+  --clay-shadow-md:
+    0 1px 0 var(--clay-highlight) inset,
+    0 6px 0 var(--clay-shadow-color),
+    0 14px 26px color-mix(in srgb, var(--clay-shadow-color) 65%, transparent);
+  --clay-shadow-hover:
+    0 1px 0 var(--clay-highlight) inset,
+    0 10px 0 var(--clay-shadow-color),
+    0 22px 34px color-mix(in srgb, var(--clay-shadow-color) 80%, transparent);
+  --clay-shadow-pressed:
+    0 2px 0 var(--clay-shadow-color),
+    0 1px 0 color-mix(in srgb, var(--clay-highlight) 80%, transparent) inset;
+
+  --glass-bg: color-mix(in srgb, var(--surface-000) 66%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--surface-000) 84%, transparent);
+  --glass-border: color-mix(in srgb, var(--surface-000) 38%, transparent);
+  --glass-blur: 14px;
+  --glass-shine: color-mix(in srgb, var(--surface-000) 32%, transparent);
+
+  --radius-chunk: 22px;
+  --radius-chunk-sm: 16px;
 }
 
 /* ---------- Base ---------- */
