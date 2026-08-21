@@ -8,27 +8,75 @@
     <title>Toddler Learning Game</title>
     <style>
       :root {
-        --primary: #6ecb63;
-        --primary-deep: #3f9d3a;
-        --primary-soft: #d9f2d3;
-        --secondary: #ffc53d;
-        --secondary-deep: #d99a1e;
-        --secondary-soft: #fff0c2;
-        --accent: #57c7ff;
-        --accent-deep: #1f9fd6;
-        --accent-soft: #d6f0ff;
-        --error: #ff6b6b;
-        --error-deep: #d64545;
-        --error-soft: #ffdcdc;
-        --background: #fdf3e1;
-        --surface: #fffdf7;
-        --text: #3d352e;
-        --text-soft: #8a7d6e;
-        --edge: #f0dfc0;
-        --radius-lg: 32px;
-        --radius-md: 22px;
-        --radius-sm: 16px;
-        --radius-pill: 999px;
+        /* ==========================================================================
+           CLAYMORPHISM DESIGN TOKENS (Pure Claymorphism - 100%)
+           Adapted from claymorphism-setup.md for toddler learning game
+           ========================================================================== */
+
+        /* --- 1. COLOR PALETTE (Warm Clay Theme) --- */
+        --clay-bg: #f6d7c3;
+        --clay-bg-2: #f0bda6;
+        --clay-surface: #fdf3e1;
+        --clay-surface-soft: #fffdf7;
+        --clay-surface-recessed: #f5e7d7;
+
+        --clay-primary: #ff7a59;
+        --clay-primary-hover: #e86a4a;
+        --clay-primary-deep: #d94a2b;
+        --clay-accent: #6ecb63;
+        --clay-accent-hover: #5ab852;
+        --clay-accent-deep: #3f9d3a;
+        --clay-danger: #ff6b6b;
+        --clay-danger-deep: #d64545;
+
+        --clay-text: #3d352e;
+        --clay-text-soft: #8a7d6e;
+        --clay-dark: #f0dfc0;
+        --clay-shadow: #d9b99d;
+        --clay-highlight: #fffdf8;
+        --clay-white: #fffdf8;
+
+        /* --- 2. GEOMETRY & RADIUS SCALING --- */
+        --radius-xl: 34px;
+        --radius-lg: 26px;
+        --radius-md: 18px;
+        --radius-sm: 12px;
+        --radius-pill: 30px;
+
+        /* --- 3. SOFT 3D SHADOW TOKENS --- */
+        /* Main floating container shadow */
+        --shadow-clay:
+          8px 8px 0 var(--clay-shadow), -4px -4px 8px rgba(255, 255, 255, 0.7);
+
+        /* Smaller floating element shadow */
+        --shadow-clay-sm:
+          5px 5px 0 var(--clay-shadow), -3px -3px 6px rgba(255, 255, 255, 0.7);
+
+        /* Inset recessed shadow */
+        --shadow-inset:
+          inset 5px 5px 8px rgba(190, 145, 105, 0.25),
+          inset -4px -4px 8px rgba(255, 250, 240, 0.9);
+
+        --shadow-inset-dark:
+          inset 5px 5px 10px rgba(190, 145, 105, 0.3),
+          inset -3px -3px 6px rgba(255, 250, 240, 0.6);
+
+        /* Inner modal border overlay effect */
+        --shadow-modal-inner:
+          inset 6px 6px 0 rgba(229, 199, 173, 0.5),
+          inset -6px -6px 0 rgba(255, 253, 248, 0.7);
+
+        /* Button shadows */
+        --shadow-btn-primary:
+          6px 6px 0 var(--clay-shadow), -3px -3px 6px rgba(255, 255, 255, 0.7);
+        --shadow-btn-accent:
+          6px 6px 0 #9fc5a8, -3px -3px 6px rgba(255, 255, 255, 0.7);
+        --shadow-btn-danger:
+          6px 6px 0 #d9a0a0, -3px -3px 6px rgba(255, 255, 255, 0.7);
+
+        /* --- 4. BORDER STYLES --- */
+        --border-clay: 3px solid var(--clay-dark);
+        --border-clay-sm: 2px solid var(--clay-dark);
       }
 
       * {
@@ -37,13 +85,8 @@
 
       body {
         font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
-        background-color: var(--background);
-        background-image:
-          radial-gradient(circle at 12% 18%, rgba(255, 197, 61, 0.3) 0, rgba(255, 197, 61, 0) 240px),
-          radial-gradient(circle at 88% 12%, rgba(87, 199, 255, 0.3) 0, rgba(87, 199, 255, 0) 260px),
-          radial-gradient(circle at 85% 85%, rgba(110, 203, 99, 0.26) 0, rgba(110, 203, 99, 0) 280px),
-          radial-gradient(circle at 15% 86%, rgba(255, 107, 107, 0.18) 0, rgba(255, 107, 107, 0) 220px);
-        color: var(--text);
+        background: linear-gradient(145deg, var(--clay-bg), var(--clay-bg-2));
+        color: var(--clay-text);
         text-align: center;
         margin: 0;
         padding: 16px;
@@ -56,133 +99,172 @@
         touch-action: manipulation;
       }
 
+      /* Landscape force guard for mobile */
+      @media screen and (orientation: portrait) and (max-width: 768px) {
+        body::before {
+          content: "🔄 Please rotate your device to Landscape Mode!";
+          position: fixed;
+          inset: 0;
+          background: var(--clay-text);
+          color: var(--clay-white);
+          font-size: 1.8rem;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 20px;
+          z-index: 99999;
+        }
+      }
+
       h1 {
         display: inline-block;
-        color: #ff7a59;
+        color: var(--clay-text);
         font-size: 2.2rem;
         letter-spacing: 0.5px;
-        text-shadow: 0 3px 0 rgba(61, 53, 46, 0.14);
+        text-shadow: 2px 3px 0 rgba(217, 185, 157, 0.7);
         margin: 8px 0 18px;
-        padding: 8px 26px;
-        background: var(--surface);
-        border: 3px solid var(--edge);
+        padding: 12px 32px;
+        background: linear-gradient(145deg, #fdf3e1, #f5e7d7);
+        border: var(--border-clay);
         border-radius: var(--radius-pill);
         box-shadow:
-          inset 0 2px 0 rgba(255, 255, 255, 0.9),
-          0 6px 0 rgba(61, 53, 46, 0.08),
-          0 14px 26px rgba(61, 53, 46, 0.14);
+          inset 4px 4px 8px rgba(255, 253, 248, 0.9),
+          inset -4px -4px 8px rgba(190, 145, 105, 0.25),
+          6px 6px 0 var(--clay-shadow),
+          -3px -3px 6px rgba(255, 255, 255, 0.7);
       }
 
       h2 {
-        color: var(--text);
+        color: var(--clay-text);
         font-size: 1.7rem;
         margin: 4px 0 10px;
-        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.85);
+        text-shadow: 2px 3px 0 rgba(217, 185, 157, 0.5);
       }
 
       .container {
-        background: var(--surface);
+        background: var(--clay-surface);
         padding: 24px 22px;
-        border-radius: var(--radius-lg);
-        border: 3px solid var(--edge);
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.9),
-          inset 0 -6px 14px rgba(61, 53, 46, 0.05),
-          0 8px 0 rgba(61, 53, 46, 0.05),
-          0 22px 44px rgba(61, 53, 46, 0.16);
+        border-radius: var(--radius-xl);
+        border: var(--border-clay);
+        box-shadow: var(--shadow-clay);
         max-width: 780px;
         width: 100%;
+        position: relative;
       }
 
       .hidden {
         display: none !important;
       }
 
+      /* ==========================================================================
+         CLAY BUTTON SYSTEM
+         ========================================================================== */
       button {
         font-family: inherit;
         cursor: pointer;
-        border: none;
+        border: var(--border-clay);
         border-radius: var(--radius-pill);
         padding: 14px 24px;
         font-size: 1.1rem;
         font-weight: 800;
-        color: #fff;
+        color: var(--clay-white);
         margin: 6px;
         user-select: none;
         -webkit-user-select: none;
-        transition:
-          transform 0.15s,
-          box-shadow 0.15s,
-          filter 0.15s;
+        touch-action: manipulation;
+        transition: all 0.2s ease;
+        text-shadow: 1px 2px 0 rgba(0, 0, 0, 0.15);
       }
 
-      button:active {
-        transform: translateY(5px);
-        filter: brightness(0.97);
-      }
-
+      /* Hover: Lift element slightly */
       button:hover {
-        filter: brightness(1.03);
+        transform: translate(-1px, -1px);
       }
 
-      .btn-primary {
-        background-color: var(--primary);
-        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.14);
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.5),
-          0 6px 0 var(--primary-deep),
-          0 10px 20px rgba(61, 53, 46, 0.2);
-      }
-      .btn-primary:active {
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.5),
-          0 1px 0 var(--primary-deep),
-          0 2px 6px rgba(61, 53, 46, 0.16);
+      /* Active / Pressed: Push down and collapse shadow */
+      button:active {
+        transform: translate(3px, 3px);
       }
 
-      .btn-accent {
-        background-color: var(--accent);
-        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.14);
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.5),
-          0 6px 0 var(--accent-deep),
-          0 10px 20px rgba(61, 53, 46, 0.2);
-      }
-      .btn-accent:active {
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.5),
-          0 1px 0 var(--accent-deep),
-          0 2px 6px rgba(61, 53, 46, 0.16);
+      .clay-btn-primary {
+        background: linear-gradient(145deg, #ffa878, var(--clay-primary));
+        box-shadow: var(--shadow-btn-primary);
       }
 
-      .start-btn {
+      .clay-btn-primary:hover {
+        background: linear-gradient(145deg, #ffb088, var(--clay-primary-hover));
+      }
+
+      .clay-btn-primary:active {
+        box-shadow: 1px 1px 0 var(--clay-shadow);
+      }
+
+      .clay-btn-accent {
+        background: linear-gradient(145deg, #8ce8a0, var(--clay-accent));
+        box-shadow: var(--shadow-btn-accent);
+      }
+
+      .clay-btn-accent:hover {
+        background: linear-gradient(145deg, #9af0ac, var(--clay-accent-hover));
+      }
+
+      .clay-btn-accent:active {
+        box-shadow: 1px 1px 0 #9fc5a8;
+      }
+
+      .clay-btn-danger {
+        background: linear-gradient(145deg, #ff9a9a, var(--clay-danger));
+        box-shadow: var(--shadow-btn-danger);
+      }
+
+      .clay-btn-danger:hover {
+        background: linear-gradient(145deg, #ffaaaa, var(--clay-danger-deep));
+      }
+
+      .clay-btn-danger:active {
+        box-shadow: 1px 1px 0 #d9a0a0;
+      }
+
+      .clay-btn-start {
         font-size: 1.4rem;
         padding: 18px 52px;
         margin-top: 14px;
-        background: linear-gradient(165deg, #ffb347, #ff7847);
-        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.16);
+        background: linear-gradient(145deg, #ffb347, #ff7847);
+        text-shadow: 1px 2px 0 rgba(0, 0, 0, 0.16);
         box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.5),
-          0 8px 0 #d94a2b,
-          0 14px 28px rgba(61, 53, 46, 0.22);
-      }
-      .start-btn:active {
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.5),
-          0 2px 0 #d94a2b,
-          0 3px 8px rgba(61, 53, 46, 0.18);
+          8px 8px 0 #d97a5d,
+          -4px -4px 8px rgba(255, 255, 255, 0.7);
       }
 
-      /* ---- Settings / Menu ---- */
+      .clay-btn-start:hover {
+        background: linear-gradient(145deg, #ffbd5c, #ff8a5c);
+      }
+
+      .clay-btn-start:active {
+        box-shadow: 2px 2px 0 #d97a5d;
+      }
+
+      /* Disabled state */
+      button:disabled,
+      button.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: var(--shadow-clay-sm) !important;
+      }
+
+      /* ==========================================================================
+         SETTINGS / MENU COMPONENTS
+         ========================================================================== */
       .settings-group {
         margin: 16px 0;
         padding: 16px;
-        background: #fbf0dc;
-        border-radius: var(--radius-md);
-        border: 3px solid #f0dfc0;
-        box-shadow:
-          inset 0 3px 8px rgba(61, 53, 46, 0.08),
-          inset 0 -2px 0 rgba(255, 255, 255, 0.85);
+        background: var(--clay-surface-recessed);
+        border-radius: var(--radius-lg);
+        border: var(--border-clay);
+        box-shadow: var(--shadow-inset);
       }
 
       .settings-group h3 {
@@ -190,6 +272,7 @@
         color: #7a5a2e;
         font-size: 1.05rem;
         letter-spacing: 0.4px;
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.8);
       }
 
       .options-row {
@@ -205,58 +288,92 @@
         flex-direction: column;
         gap: 5px;
         font-weight: 800;
-        color: var(--text);
+        color: var(--clay-text);
         font-size: 0.95rem;
         align-items: center;
       }
 
-      .field select {
+      .clay-select {
         font-family: inherit;
         font-size: 1.02rem;
         font-weight: 800;
-        color: var(--text);
+        color: var(--clay-text);
         padding: 10px 14px;
         border-radius: var(--radius-pill);
-        border: 3px solid #e8d5b0;
-        background: white;
-        box-shadow:
-          inset 0 2px 4px rgba(61, 53, 46, 0.06),
-          0 3px 0 rgba(61, 53, 46, 0.08);
+        border: var(--border-clay-sm);
+        background: var(--clay-white);
+        box-shadow: var(--shadow-clay-sm);
         cursor: pointer;
         min-width: 170px;
         text-align: center;
+        outline: none;
+        transition: all 0.2s ease;
       }
 
-      .field select:disabled {
-        background: #ece5da;
-        color: #a89b89;
-        border-color: #ddd2bf;
-        box-shadow: inset 0 2px 4px rgba(61, 53, 46, 0.06);
+      .clay-select:hover {
+        transform: translate(-1px, -1px);
+        box-shadow:
+          7px 7px 0 var(--clay-shadow),
+          -3px -3px 6px rgba(255, 255, 255, 0.7);
+      }
+
+      .clay-select:active {
+        transform: translate(3px, 3px);
+        box-shadow: 2px 2px 0 var(--clay-shadow);
+      }
+
+      .clay-select:disabled {
+        background: var(--clay-surface-recessed);
+        color: var(--clay-text-soft);
+        border-color: var(--clay-dark);
+        box-shadow: var(--shadow-inset);
         cursor: not-allowed;
+        transform: none;
       }
 
-      .check-field {
+      .clay-toggle-btn {
         flex-direction: row;
         align-items: center;
         gap: 8px;
         font-size: 1rem;
         font-weight: 800;
         padding: 10px 14px;
-        border: 3px solid #e8d5b0;
+        border: var(--border-clay-sm);
         border-radius: var(--radius-pill);
-        background: white;
-        box-shadow:
-          inset 0 2px 4px rgba(61, 53, 46, 0.06),
-          0 3px 0 rgba(61, 53, 46, 0.08);
+        background: var(--clay-white);
+        box-shadow: var(--shadow-clay-sm);
         user-select: none;
+        cursor: pointer;
+        color: var(--clay-text);
+        transition: all 0.2s ease;
+      }
+
+      .clay-toggle-btn:hover {
+        transform: translate(-1px, -1px);
+        box-shadow:
+          7px 7px 0 var(--clay-shadow),
+          -3px -3px 6px rgba(255, 255, 255, 0.7);
+      }
+
+      .clay-toggle-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 2px 2px 0 var(--clay-shadow);
+      }
+
+      .clay-toggle-btn input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        accent-color: var(--clay-accent);
         cursor: pointer;
       }
 
-      .check-field input[type="checkbox"] {
-        width: 22px;
-        height: 22px;
-        accent-color: var(--accent);
-        cursor: pointer;
+      /* Active/selected state for toggle */
+      .clay-toggle-btn.active,
+      .clay-toggle-btn:has(input:checked) {
+        border-color: var(--clay-primary);
+        background: linear-gradient(145deg, #ffb08c, var(--clay-primary));
+        color: var(--clay-white);
+        box-shadow: var(--shadow-clay-sm);
       }
 
       .note {
@@ -264,13 +381,16 @@
         font-weight: 800;
         margin: 12px 0 0;
         font-size: 0.95rem;
-        background: var(--error-soft);
-        border: 2px dashed var(--error);
-        border-radius: var(--radius-sm);
+        background: rgba(255, 107, 107, 0.15);
+        border: 2px dashed var(--clay-danger);
+        border-radius: var(--radius-md);
         padding: 8px 12px;
+        box-shadow: var(--shadow-inset);
       }
 
-      /* ---- Game screen ---- */
+      /* ==========================================================================
+         GAME SCREEN COMPONENTS
+         ========================================================================== */
       .game-top {
         display: flex;
         justify-content: space-between;
@@ -280,28 +400,30 @@
         margin-bottom: 8px;
       }
 
+      .clay-pill {
+        background: linear-gradient(145deg, #fdf3e1, #f5e7d7);
+        color: var(--clay-text);
+        padding: 6px 16px;
+        border-radius: var(--radius-pill);
+        border: var(--border-clay-sm);
+        box-shadow: 3px 3px 0 rgba(217, 185, 157, 0.6);
+        font-weight: 800;
+        font-size: 1rem;
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.8);
+      }
+
       #progress {
         font-size: 1.15rem;
-        color: var(--text-soft);
+        color: var(--clay-text-soft);
         font-weight: 800;
-        background: white;
-        border: 3px solid var(--edge);
-        border-radius: var(--radius-pill);
-        padding: 6px 16px;
-        box-shadow:
-          inset 0 2px 0 rgba(255, 255, 255, 0.9),
-          0 3px 0 rgba(61, 53, 46, 0.08);
       }
 
       #mode-label {
         font-size: 1rem;
-        background: var(--secondary-soft);
-        border: 3px solid #ffd76a;
+        background: linear-gradient(145deg, #fff0c2, #ffe082);
+        border: var(--border-clay-sm);
         color: #7a5310;
-        border-radius: var(--radius-pill);
-        padding: 6px 14px;
-        font-weight: 800;
-        box-shadow: 0 3px 0 rgba(61, 53, 46, 0.08);
+        box-shadow: 3px 3px 0 rgba(217, 185, 157, 0.6);
       }
 
       #hint-line {
@@ -310,6 +432,7 @@
         margin-bottom: 8px;
         min-height: 26px;
         font-weight: 800;
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.7);
       }
 
       .feedback {
@@ -318,36 +441,48 @@
         font-weight: 800;
         margin: 10px 0;
         line-height: 1.3;
-      }
-      .feedback.good {
-        color: var(--primary-deep);
-        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.85);
-      }
-      .feedback.bad {
-        color: var(--error-deep);
-        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.85);
-      }
-      .feedback.hint {
-        color: var(--accent-deep);
-        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.85);
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        border: var(--border-clay-sm);
+        box-shadow: var(--shadow-clay-sm);
       }
 
-      /* ---- Play area ---- */
+      .feedback.good {
+        color: var(--clay-accent-deep);
+        background: linear-gradient(145deg, #d9f2d3, #c9ead9);
+        border-color: var(--clay-accent);
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.85);
+      }
+
+      .feedback.bad {
+        color: var(--clay-danger-deep);
+        background: linear-gradient(145deg, #ffdcdc, #ffe8e8);
+        border-color: var(--clay-danger);
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.85);
+      }
+
+      .feedback.hint {
+        color: #1f9fd6;
+        background: linear-gradient(145deg, #d6f0ff, #c0e4ff);
+        border-color: #57c7ff;
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.85);
+      }
+
+      /* ==========================================================================
+         PLAY AREA
+         ========================================================================== */
       #play-area {
         position: relative;
         width: 100%;
         max-width: 700px;
+        height: 420px;
         margin: 0 auto;
-        background: #fff6df;
+        background: var(--clay-surface-soft);
         background-image: radial-gradient(#e8d5a8 1.4px, transparent 1.4px);
         background-size: 26px 26px;
-        border: 4px solid #ffe9bd;
-        border-radius: 28px;
-        box-shadow:
-          inset 0 4px 10px rgba(61, 53, 46, 0.1),
-          inset 0 -3px 0 rgba(255, 255, 255, 0.85),
-          0 6px 0 rgba(61, 53, 46, 0.07),
-          0 18px 36px rgba(61, 53, 46, 0.16);
+        border: var(--border-clay);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-inset-dark);
         overflow: hidden;
         touch-action: none;
         user-select: none;
@@ -370,20 +505,18 @@
         touch-action: none;
       }
 
-      /* ---- Game items ---- */
+      /* ==========================================================================
+         GAME ITEMS (Clay tokens)
+         ========================================================================== */
       .game-item {
         position: absolute;
         z-index: 2;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: white;
-        border-radius: 20px;
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.95),
-          inset 0 -3px 0 rgba(61, 53, 46, 0.06),
-          0 5px 0 rgba(61, 53, 46, 0.12),
-          0 9px 18px rgba(61, 53, 46, 0.12);
+        background: var(--clay-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-clay-sm);
         transition:
           box-shadow 0.15s,
           background 0.15s;
@@ -391,13 +524,13 @@
       }
 
       .q-item {
-        border: 4px dashed var(--accent);
-        background: var(--accent-soft);
+        border: 4px dashed var(--clay-accent);
+        background: rgba(87, 199, 255, 0.12);
       }
 
       .a-item {
-        border: 4px solid var(--primary);
-        background: var(--primary-soft);
+        border: 4px solid var(--clay-accent);
+        background: rgba(110, 203, 99, 0.12);
       }
 
       .q-badge {
@@ -405,18 +538,15 @@
         top: -13px;
         right: -9px;
         font-size: 1rem;
-        background: linear-gradient(165deg, #6cd4ff, #2fa8e8);
-        color: white;
+        background: linear-gradient(145deg, #6cd4ff, #2fa8e8);
+        color: var(--clay-white);
         border-radius: 50%;
         width: 30px;
         height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow:
-          inset 0 2px 0 rgba(255, 255, 255, 0.5),
-          0 3px 0 var(--accent-deep),
-          0 4px 8px rgba(61, 53, 46, 0.2);
+        box-shadow: var(--shadow-btn-accent);
         z-index: 3;
         text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
       }
@@ -431,31 +561,24 @@
       .is-selected {
         box-shadow:
           0 0 0 6px rgba(87, 199, 255, 0.4),
-          inset 0 3px 0 rgba(255, 255, 255, 0.95),
-          0 5px 0 rgba(61, 53, 46, 0.12),
-          0 9px 18px rgba(61, 53, 46, 0.12);
+          var(--shadow-clay-sm);
       }
 
       .is-matched {
         border-style: solid;
-        border-color: #3f9d3a;
-        background: #d9f2d3;
-        box-shadow:
-          inset 0 3px 0 rgba(255, 255, 255, 0.7),
-          0 3px 0 rgba(61, 53, 46, 0.1),
-          0 6px 12px rgba(61, 53, 46, 0.1);
+        border-color: var(--clay-accent-deep);
+        background: linear-gradient(145deg, #d9f2d3, #c9ead9);
+        box-shadow: var(--shadow-clay-sm);
         animation: pop 0.4s;
       }
 
       .is-blocked {
         border-style: solid;
-        background: #e9e2d7;
-        border-color: #b9ac9a;
+        background: var(--clay-surface-recessed);
+        border-color: var(--clay-dark);
         opacity: 0.7;
         filter: grayscale(0.9);
-        box-shadow:
-          inset 0 2px 5px rgba(61, 53, 46, 0.14),
-          0 2px 0 rgba(61, 53, 46, 0.1);
+        box-shadow: var(--shadow-inset);
       }
 
       .game-item::after {
@@ -465,7 +588,7 @@
         width: 28px;
         height: 28px;
         font-size: 15px;
-        color: white;
+        color: var(--clay-white);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -476,25 +599,19 @@
 
       .is-matched::after {
         content: "✓";
-        background: linear-gradient(165deg, #7ed957, #57b846);
-        box-shadow:
-          inset 0 2px 0 rgba(255, 255, 255, 0.5),
-          0 3px 0 #3f9d3a,
-          0 4px 8px rgba(61, 53, 46, 0.2);
+        background: linear-gradient(145deg, #7ed957, #57b846);
+        box-shadow: var(--shadow-btn-accent);
       }
 
       .is-blocked::after {
         content: "✕";
-        background: linear-gradient(165deg, #cfc4b4, #b9ac9a);
-        box-shadow:
-          inset 0 2px 0 rgba(255, 255, 255, 0.5),
-          0 3px 0 #968974,
-          0 4px 8px rgba(61, 53, 46, 0.18);
+        background: linear-gradient(145deg, #cfc4b4, #b9ac9a);
+        box-shadow: var(--shadow-btn-primary);
       }
 
       .wrong-flash {
-        border-color: var(--error) !important;
-        background: var(--error-soft) !important;
+        border-color: var(--clay-danger) !important;
+        background: rgba(255, 107, 107, 0.15) !important;
       }
 
       .shake {
@@ -532,7 +649,9 @@
         }
       }
 
-      /* ---- Crayon palette ---- */
+      /* ==========================================================================
+         CRAYON PALETTE (Clay spheres)
+         ========================================================================== */
       #crayon-bar {
         display: flex;
         justify-content: center;
@@ -545,27 +664,33 @@
         width: 52px;
         height: 52px;
         border-radius: 50%;
-        border: 3px solid rgba(255, 255, 255, 0.75);
+        border: var(--border-clay-sm);
         box-shadow:
-          inset 0 4px 0 rgba(255, 255, 255, 0.45),
-          0 6px 0 rgba(61, 53, 46, 0.2),
-          0 8px 14px rgba(61, 53, 46, 0.16);
+          inset 4px 4px 8px rgba(255, 253, 248, 0.5),
+          inset -4px -4px 8px rgba(190, 145, 105, 0.2),
+          6px 6px 0 var(--clay-shadow),
+          -3px -3px 6px rgba(255, 255, 255, 0.7);
         padding: 0;
         margin: 0;
-        transition:
-          transform 0.15s,
-          box-shadow 0.15s,
-          opacity 0.15s;
+        transition: all 0.2s ease;
       }
 
       .crayon.active {
-        transform: translateY(-4px) scale(1.12);
-        border-color: #fff;
+        transform: translate(-2px, -6px) scale(1.12);
+        border-color: var(--clay-white);
         box-shadow:
           0 0 0 5px #ffe082,
-          inset 0 4px 0 rgba(255, 255, 255, 0.45),
-          0 8px 0 rgba(61, 53, 46, 0.2),
-          0 12px 20px rgba(61, 53, 46, 0.2);
+          inset 4px 4px 8px rgba(255, 253, 248, 0.5),
+          8px 8px 0 var(--clay-shadow),
+          -4px -4px 8px rgba(255, 255, 255, 0.7);
+      }
+
+      .crayon:active:not(.used) {
+        transform: translate(3px, 3px) scale(1);
+        box-shadow:
+          inset 4px 4px 8px rgba(190, 145, 105, 0.25),
+          inset -3px -3px 6px rgba(255, 253, 248, 0.6),
+          2px 2px 0 var(--clay-shadow);
       }
 
       .crayon.used {
@@ -574,8 +699,9 @@
         filter: grayscale(1);
         transform: scale(0.9) translateY(3px);
         box-shadow:
-          inset 0 3px 5px rgba(61, 53, 46, 0.25),
-          0 2px 0 rgba(61, 53, 46, 0.12);
+          inset 4px 4px 8px rgba(190, 145, 105, 0.25),
+          inset -3px -3px 6px rgba(255, 253, 248, 0.6),
+          2px 2px 0 var(--clay-shadow);
       }
 
       #crayon-hint {
@@ -583,27 +709,35 @@
         color: #8a5a2b;
         font-weight: 800;
         margin: 12px 0 0;
-        background: var(--secondary-soft);
-        border: 3px solid #ffd76a;
+        background: linear-gradient(145deg, #fff0c2, #ffe082);
+        border: var(--border-clay-sm);
         border-radius: var(--radius-pill);
         padding: 8px 16px;
-        box-shadow: 0 3px 0 rgba(61, 53, 46, 0.08);
+        box-shadow: 3px 3px 0 rgba(217, 185, 157, 0.6);
+        text-shadow: 1px 2px 0 rgba(255, 253, 248, 0.8);
       }
 
-      /* ---- End screen ---- */
+      /* ==========================================================================
+         END SCREEN
+         ========================================================================== */
+      .clay-text-pop {
+        font-size: 3rem;
+        font-weight: 900;
+        color: var(--clay-accent-deep);
+        text-shadow: 3px 4px 0 rgba(217, 185, 157, 0.75);
+      }
+
       #score-display {
         font-size: 3rem;
-        color: var(--primary-deep);
+        color: var(--clay-accent-deep);
         margin: 20px 0;
         font-weight: 800;
-        text-shadow:
-          0 3px 0 rgba(255, 255, 255, 0.85),
-          0 7px 0 rgba(61, 53, 46, 0.12);
+        text-shadow: 3px 4px 0 rgba(217, 185, 157, 0.75);
       }
     </style>
   </head>
   <body>
-    <h1>🌟 Play & Learn! 🌟</h1>
+    <!-- <h1>🌟 Play & Learn! 🌟</h1> -->
 
     <!-- MAIN MENU -->
     <div id="menu-screen" class="container">
@@ -614,26 +748,27 @@
         <div class="options-row">
           <label class="field">
             🎮 Game Mode
-            <select id="mode-select">
+            <select id="mode-select" class="clay-select">
               <option value="normal">😊 Normal (Learn & Retry)</option>
               <option value="score">🏆 Score (Test Skills)</option>
             </select>
           </label>
           <label class="field">
             ✏️ Drawing Mode
-            <select id="draw-select">
+            <select id="draw-select" class="clay-select">
               <option value="line">Line</option>
               <option value="simple">Simple (Free Color)</option>
               <option value="strict">Strict</option>
             </select>
           </label>
-          <label class="check-field">
+          <label class="clay-toggle-btn check-field">
             <input type="checkbox" id="random-check" />
             🎲 Random Placement
           </label>
         </div>
         <p id="strict-note" class="note hidden">
-          ⚠️ Strict mode automatically uses Score rules: one attempt per answer — wrong answers get locked!
+          ⚠️ Strict mode automatically uses Score rules: one attempt per answer
+          — wrong answers get locked!
         </p>
       </div>
 
@@ -642,7 +777,7 @@
         <div class="options-row">
           <label class="field">
             📋 Type
-            <select id="type-select">
+            <select id="type-select" class="clay-select">
               <option value="1">Type 1 — Text ➔ Emoticon</option>
               <option value="2">Type 2 — Emoticon ➔ Text</option>
               <option value="3">Type 3 — Match Emoticon</option>
@@ -657,7 +792,7 @@
         <div class="options-row">
           <label class="field">
             ⭐ Level
-            <select id="diff-select">
+            <select id="diff-select" class="clay-select">
               <option value="1">⭐ Easy (3 pairs = 6 items)</option>
               <option value="2">⭐⭐ Medium (4 pairs = 8 items)</option>
               <option value="3">⭐⭐⭐ Hard (5 pairs = 10 items)</option>
@@ -666,7 +801,7 @@
         </div>
       </div>
 
-      <button class="btn-primary start-btn" onclick="startGame()">
+      <button class="clay-btn-primary clay-btn-start" onclick="startGame()">
         🚀 Start Game
       </button>
     </div>
@@ -674,10 +809,12 @@
     <!-- GAME SCREEN -->
     <div id="game-screen" class="container hidden">
       <div class="game-top">
-        <div id="progress">Stage 1 of 10</div>
-        <div id="mode-label">✏️ Line Mode</div>
+        <div id="progress" class="clay-pill">Stage 1 of 10</div>
+        <div id="mode-label" class="clay-pill">✏️ Line Mode</div>
       </div>
-      <div id="hint-line">Draw a line from a ❓ question to its matching answer!</div>
+      <div id="hint-line">
+        Draw a line from a ❓ question to its matching answer!
+      </div>
       <div id="fb" class="feedback"></div>
       <div id="play-area">
         <canvas id="canvas"></canvas>
@@ -691,9 +828,11 @@
     <!-- END SCREEN -->
     <div id="end-screen" class="container hidden">
       <h2>🎉 All Done! 🎉</h2>
-      <div id="score-display"></div>
-      <button class="btn-primary" onclick="startGame()">Play Again!</button>
-      <button class="btn-accent" onclick="returnToMenu()">Menu</button>
+      <div id="score-display" class="clay-text-pop"></div>
+      <button class="clay-btn-primary" onclick="startGame()">
+        Play Again!
+      </button>
+      <button class="clay-btn-accent" onclick="returnToMenu()">Menu</button>
     </div>
 
     <script>
@@ -720,205 +859,727 @@
           { text: "banana", emoji: "🍌" },
           { text: "cow", emoji: "🐮" },
           { text: "pig", emoji: "🐷" },
-          { text: "rocket", emoji: "🚀" },
-          { text: "heart", emoji: "❤️" },
+          { text: "duck", emoji: "🦆" },
+          { text: "frog", emoji: "🐸" },
+          { text: "horse", emoji: "🐴" },
+          { text: "sheep", emoji: "🐑" },
+          { text: "lion", emoji: "🦁" },
+          { text: "tiger", emoji: "🐯" },
+          { text: "bear", emoji: "🐻" },
+          { text: "elephant", emoji: "🐘" },
+          { text: "monkey", emoji: "🐒" },
+          { text: "panda", emoji: "🐼" },
+          { text: "koala", emoji: "🐨" },
+          { text: "kangaroo", emoji: "🦘" },
+          { text: "giraffe", emoji: "🦒" },
+          { text: "zebra", emoji: "🦓" },
+          { text: "hippo", emoji: "🦛" },
+          { text: "rhino", emoji: "🦏" },
+          { text: "penguin", emoji: "🐧" },
+          { text: "owl", emoji: "🦉" },
+          { text: "bat", emoji: "🦇" },
+          { text: "bee", emoji: "🐝" },
+          { text: "butterfly", emoji: "🦋" },
+          { text: "snail", emoji: "🐌" },
+          { text: "worm", emoji: "🪱" },
+          { text: "spider", emoji: "🕷️" },
+          { text: "ant", emoji: "🐜" },
+          { text: "fly", emoji: "🪰" },
+          { text: "mosquito", emoji: "🦟" },
+          { text: "ladybug", emoji: "🐞" },
+          { text: "dragonfly", emoji: "🪲" },
+          { text: "octopus", emoji: "🐙" },
+          { text: "shark", emoji: "🦈" },
+          { text: "whale", emoji: "🐋" },
+          { text: "dolphin", emoji: "🐬" },
+          { text: "turtle", emoji: "🐢" },
+          { text: "crab", emoji: "🦀" },
+          { text: "shrimp", emoji: "🦐" },
+          { text: "lobster", emoji: "🦞" },
+          { text: "squid", emoji: "🦑" },
+          { text: "jellyfish", emoji: "🪼" },
+          { text: "seahorse", emoji: "🌊" },
+          { text: "coral", emoji: "🪸" },
         ];
 
-        // --- CRAYONS (Simple mode) ---
-        var CRAYONS = [
-          { name: "red", stroke: "#f44336", fill: "rgba(244,67,54,0.40)" },
-          { name: "orange", stroke: "#ff9800", fill: "rgba(255,152,0,0.40)" },
-          { name: "yellow", stroke: "#ffc107", fill: "rgba(255,193,7,0.45)" },
-          { name: "green", stroke: "#4caf50", fill: "rgba(76,175,80,0.40)" },
-          { name: "blue", stroke: "#2196f3", fill: "rgba(33,150,243,0.40)" },
-          { name: "purple", stroke: "#9c27b0", fill: "rgba(156,39,176,0.40)" },
+        // --- CRAYON COLORS ---
+        var crayonColors = [
+          "#e53935",
+          "#d81b60",
+          "#8e24aa",
+          "#5e35b1",
+          "#3949ab",
+          "#1e88e5",
+          "#039be5",
+          "#00acc1",
+          "#00897b",
+          "#43a047",
+          "#7cb342",
+          "#c0ca33",
+          "#fdd835",
+          "#ffb300",
+          "#fb8c00",
+          "#f4511e",
+          "#6d4c41",
+          "#757575",
+          "#546e7a",
         ];
 
-        // --- GAME STATE ---
-        var TOTAL_STAGES = 10;
-        var currentMode = "normal"; // 'normal' or 'score'
-        var currentDrawMode = "line"; // 'line', 'simple', 'strict'
-        var randomPlacement = false;
-        var selectedType = 1; // 1..4
-        var currentDifficulty = 1; // 1..3 -> N = difficulty + 2 pairs
-        var stageIndex = 0;
+        // --- STATE ---
+        var currentStage = 0;
+        var totalStages = 10;
         var score = 0;
-        var maxScore = 0;
-        var stageAdvancing = false;
-        var stageState = null; // { type, pairs: [...] }
+        var stageScore = 0;
+        var gameData = [];
+        var gameMode = "normal";
+        var drawingMode = "line";
+        var isRandomPlacement = false;
+        var selectedQuestion = null;
+        var selectedAnswer = null;
+        var lines = [];
+        var currentLine = null;
+        var isDrawing = false;
+        var currentCrayon = 0;
+        var usedCrayons = [];
+        var pairColors = {};
+        var questionType = 1;
+        var difficulty = 1;
 
-        var crayonUsed = [false, false, false, false, false, false];
-        var activeCrayon = 0;
-
-        var items = []; // all placed DOM-backed items
-        var strokes = []; // simple-mode free strokes
-        var currentLine = null; // { pairId, x, y } active drag line
-        var selectedQ = null; // line mode: selected question item
-        var strokeActive = null; // simple mode: stroke in progress
-        var drawing = false;
-        var lineDrag = false;
-        var tapTarget = null;
-        var tapStart = null;
-        var markSeq = 0;
-
-        // --- DOM ELEMENTS ---
+        // --- DOM ---
         var menuScreen = document.getElementById("menu-screen");
         var gameScreen = document.getElementById("game-screen");
         var endScreen = document.getElementById("end-screen");
-        var modeSelect = document.getElementById("mode-select");
-        var drawSelect = document.getElementById("draw-select");
-        var randomCheck = document.getElementById("random-check");
-        var typeSelect = document.getElementById("type-select");
-        var diffSelect = document.getElementById("diff-select");
-        var strictNote = document.getElementById("strict-note");
-        var progressDiv = document.getElementById("progress");
-        var modeLabel = document.getElementById("mode-label");
-        var hintLine = document.getElementById("hint-line");
-        var fb = document.getElementById("fb");
-        var playArea = document.getElementById("play-area");
         var canvas = document.getElementById("canvas");
         var ctx = canvas.getContext("2d");
+        var playArea = document.getElementById("play-area");
+        var progressEl = document.getElementById("progress");
+        var modeLabel = document.getElementById("mode-label");
+        var hintLine = document.getElementById("hint-line");
+        var feedback = document.getElementById("fb");
         var crayonBar = document.getElementById("crayon-bar");
         var crayonHint = document.getElementById("crayon-hint");
         var scoreDisplay = document.getElementById("score-display");
 
-        // --- HELPERS ---
-        function shuffleArray(array) {
-          var curId = array.length;
-          while (0 !== curId) {
-            var randId = Math.floor(Math.random() * curId);
-            curId -= 1;
-            var tmp = array[curId];
-            array[curId] = array[randId];
-            array[randId] = tmp;
-          }
-          return array;
+        // --- INIT ---
+        function init() {
+          window.addEventListener("resize", onResize);
+          setupEventListeners();
         }
 
-        function esc(s) {
-          return String(s).replace(/[&<>"']/g, function (c) {
-            return {
-              "&": "&",
-              "<": "<",
-              ">": ">",
-              '"': "\"",
-              "'": "&#39;",
-            }[c];
+        function onResize() {
+          canvas.width = playArea.clientWidth;
+          canvas.height = playArea.clientHeight;
+          redrawCanvas();
+        }
+
+        function setupEventListeners() {
+          // Menu controls
+          document
+            .getElementById("mode-select")
+            .addEventListener("change", function (e) {
+              gameMode = e.target.value;
+            });
+          document
+            .getElementById("draw-select")
+            .addEventListener("change", function (e) {
+              drawingMode = e.target.value;
+              updateStrictNote();
+            });
+          document
+            .getElementById("type-select")
+            .addEventListener("change", function (e) {
+              questionType = parseInt(e.target.value);
+            });
+          document
+            .getElementById("diff-select")
+            .addEventListener("change", function (e) {
+              difficulty = parseInt(e.target.value);
+            });
+          document
+            .getElementById("random-check")
+            .addEventListener("change", function (e) {
+              isRandomPlacement = e.target.checked;
+              var toggleBtn = document.querySelector(".check-field");
+              if (e.target.checked) toggleBtn.classList.add("active");
+              else toggleBtn.classList.remove("active");
+            });
+
+          // Canvas events
+          playArea.addEventListener("mousedown", startDrawing);
+          playArea.addEventListener("mousemove", draw);
+          playArea.addEventListener("mouseup", stopDrawing);
+          playArea.addEventListener("mouseleave", stopDrawing);
+          playArea.addEventListener("touchstart", handleTouchStart, {
+            passive: false,
+          });
+          playArea.addEventListener("touchmove", handleTouchMove, {
+            passive: false,
+          });
+          playArea.addEventListener("touchend", handleTouchEnd);
+
+          // Prevent context menu
+          playArea.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
           });
         }
 
-        function difficultyPairs() {
-          return currentDifficulty + 2; // easy 3 / medium 4 / hard 5
-        }
-
-        function toLocal(e) {
-          var r = playArea.getBoundingClientRect();
-          return { x: e.clientX - r.left, y: e.clientY - r.top };
-        }
-
-        function inRect(p, r, m) {
-          return (
-            p.x >= r.x - m &&
-            p.x <= r.x + r.w + m &&
-            p.y >= r.y - m &&
-            p.y <= r.y + r.h + m
-          );
-        }
-
-        function centerItem(it) {
-          return { x: it.x + it.w / 2, y: it.y + it.h / 2 };
-        }
-
-        function dist(a, b) {
-          return Math.hypot(a.x - b.x, a.y - b.y);
-        }
-
-        function showFeedback(html, type) {
-          fb.className = "feedback " + (type || "");
-          fb.innerHTML = html;
-        }
-
-        function flashItems(list) {
-          list.forEach(function (it) {
-            it.el.classList.add("shake", "wrong-flash");
-            setTimeout(function () {
-              it.el.classList.remove("shake", "wrong-flash");
-            }, 650);
-          });
-        }
-
-        // --- DRAW MODE & MENU ---
-        function setDrawUI() {
-          currentDrawMode = drawSelect.value;
-          if (currentDrawMode === "strict") {
-            modeSelect.value = "score";
-            currentMode = "score";
-            modeSelect.disabled = true;
-            strictNote.classList.remove("hidden");
+        function updateStrictNote() {
+          var note = document.getElementById("strict-note");
+          if (drawingMode === "strict") {
+            note.classList.remove("hidden");
+            document.getElementById("mode-select").value = "score";
+            gameMode = "score";
+            document.getElementById("mode-select").disabled = true;
+            document.querySelector(
+              "#mode-select option[value='normal']",
+            ).disabled = true;
           } else {
-            modeSelect.disabled = false;
-            strictNote.classList.add("hidden");
+            note.classList.add("hidden");
+            document.getElementById("mode-select").disabled = false;
+            document.querySelector(
+              "#mode-select option[value='normal']",
+            ).disabled = false;
           }
         }
 
-        function drawModeLabel() {
-          if (currentDrawMode === "simple") return "🎨 Simple Mode";
-          if (currentDrawMode === "strict") return "🎯 Strict Mode";
-          return "✏️ Line Mode";
-        }
-
-        function drawModeHint() {
-          if (currentDrawMode === "simple")
-            return "Scribble / tap TWO matching items with the SAME crayon color!";
-          if (currentDrawMode === "strict")
-            return "One try per answer — wrong answers get locked! 🔒";
-          return "Draw a line from a ❓ question to its matching answer!";
-        }
-
-        modeSelect.onchange = function () {
-          currentMode = modeSelect.value;
-        };
-        drawSelect.onchange = setDrawUI;
-        typeSelect.onchange = function () {
-          selectedType = Number(typeSelect.value);
-        };
-        diffSelect.onchange = function () {
-          currentDifficulty = Number(diffSelect.value);
-        };
-        randomCheck.onchange = function () {
-          randomPlacement = randomCheck.checked;
-        };
-
+        // --- GAME FLOW ---
         function startGame() {
-          setDrawUI();
-          currentMode =
-            currentDrawMode === "strict" ? "score" : modeSelect.value;
-          selectedType = Number(typeSelect.value);
-          currentDifficulty = Number(diffSelect.value);
-          randomPlacement = randomCheck.checked;
-
-          stageIndex = 0;
+          currentStage = 0;
           score = 0;
-          maxScore = TOTAL_STAGES * difficultyPairs();
-          stageState = null;
-          stageAdvancing = false;
-          crayonUsed = [false, false, false, false, false, false];
-          activeCrayon = 0;
+          totalStages = 10;
+          nextStage();
+        }
+
+        function nextStage() {
+          if (currentStage >= totalStages) {
+            showEndScreen();
+            return;
+          }
+
+          currentStage++;
+          stageScore = 0;
+          lines = [];
+          currentLine = null;
+          isDrawing = false;
+          selectedQuestion = null;
+          selectedAnswer = null;
+          usedCrayons = [];
+          currentCrayon = 0;
+          pairColors = {};
 
           menuScreen.classList.add("hidden");
           endScreen.classList.add("hidden");
           gameScreen.classList.remove("hidden");
 
-          modeLabel.innerText = drawModeLabel();
-          hintLine.innerText = drawModeHint();
-          showFeedback("", "");
+          generateStage();
+          renderStage();
+          onResize();
+        }
 
-          var isSimple = currentDrawMode === "simple";
-          crayonBar.classList.toggle("hidden", !isSimple);
-          crayonHint.classList.toggle("hidden", !isSimple);
-          playArea.classList.toggle("free-draw", isSimple);
+        function generateStage() {
+          var pairsCount = difficulty === 1 ? 3 : difficulty === 2 ? 4 : 5;
+          var shuffled = shuffleArray([...dictionary]);
+          var selected = shuffled.slice(0, pairsCount);
 
-          newStage();
+          gameData = [];
+
+          selected.forEach(function (item, index) {
+            var qType = questionType;
+            if (qType === 4) qType = [1, 2, 3][Math.floor(Math.random() * 3)];
+
+            var pairId = index;
+            var qItem, aItem;
+
+            switch (qType) {
+              case 1:
+                qItem = {
+                  type: "text",
+                  content: item.text,
+                  isQuestion: true,
+                  pairId: pairId,
+                };
+                aItem = {
+                  type: "emoji",
+                  content: item.emoji,
+                  isQuestion: false,
+                  pairId: pairId,
+                };
+                break;
+              case 2:
+                qItem = {
+                  type: "emoji",
+                  content: item.emoji,
+                  isQuestion: true,
+                  pairId: pairId,
+                };
+                aItem = {
+                  type: "text",
+                  content: item.text,
+                  isQuestion: false,
+                  pairId: pairId,
+                };
+                break;
+              case 3:
+                qItem = {
+                  type: "emoji",
+                  content: item.emoji,
+                  isQuestion: true,
+                  pairId: pairId,
+                };
+                aItem = {
+                  type: "emoji",
+                  content: item.emoji,
+                  isQuestion: false,
+                  pairId: pairId,
+                };
+                break;
+            }
+
+            gameData.push(qItem, aItem);
+          });
+
+          if (isRandomPlacement) {
+            shuffleArray(gameData);
+          } else {
+            // Group questions on left, answers on right
+            var questions = gameData.filter(function (d) {
+              return d.isQuestion;
+            });
+            var answers = gameData.filter(function (d) {
+              return !d.isQuestion;
+            });
+            gameData = questions.concat(answers);
+          }
+
+          // Assign positions
+          var cols = 2;
+          var rows = Math.ceil(gameData.length / 2);
+          var areaRect = playArea.getBoundingClientRect();
+          var itemW = 140;
+          var itemH = 60;
+          var startX = (areaRect.width - (cols * itemW + (cols - 1) * 30)) / 2;
+          var startY = (areaRect.height - (rows * itemH + (rows - 1) * 20)) / 2;
+
+          gameData.forEach(function (item, index) {
+            var col = index % cols;
+            var row = Math.floor(index / cols);
+            item.x = startX + col * (itemW + 30);
+            item.y = startY + row * (itemH + 20);
+            item.width = itemW;
+            item.height = itemH;
+            item.matched = false;
+            item.blocked = false;
+          });
+        }
+
+        function shuffleArray(arr) {
+          for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+          }
+          return arr;
+        }
+
+        function renderStage() {
+          updateProgress();
+          renderItems();
+          renderCrayons();
+          redrawCanvas();
+        }
+
+        function updateProgress() {
+          progressEl.textContent =
+            "Stage " + currentStage + " of " + totalStages;
+
+          var modeText = "";
+          switch (drawingMode) {
+            case "line":
+              modeText = "✏️ Line Mode";
+              break;
+            case "simple":
+              modeText = "🎨 Simple Mode";
+              break;
+            case "strict":
+              modeText = "🔒 Strict Mode";
+              break;
+          }
+          modeLabel.textContent = modeText;
+
+          if (drawingMode === "simple" || drawingMode === "strict") {
+            hintLine.textContent =
+              "🎨 Pick a crayon, then color a matching pair with the SAME color!";
+            crayonBar.classList.remove("hidden");
+            crayonHint.classList.remove("hidden");
+          } else {
+            hintLine.textContent =
+              "Draw a line from a ❓ question to its matching answer!";
+            crayonBar.classList.add("hidden");
+            crayonHint.classList.add("hidden");
+          }
+        }
+
+        function renderItems() {
+          playArea.querySelectorAll(".game-item").forEach(function (el) {
+            el.remove();
+          });
+
+          gameData.forEach(function (item, index) {
+            if (item.matched) return;
+
+            var div = document.createElement("div");
+            div.className =
+              "game-item " + (item.isQuestion ? "q-item" : "a-item");
+            div.style.left = item.x + "px";
+            div.style.top = item.y + "px";
+            div.style.width = item.width + "px";
+            div.style.height = item.height + "px";
+            div.dataset.index = index;
+            div.dataset.pairId = item.pairId;
+            div.dataset.isQuestion = item.isQuestion;
+
+            var content = document.createElement("div");
+            content.className = "item-content";
+            if (item.type === "emoji") {
+              content.style.fontSize = "2.2rem";
+              content.textContent = item.content;
+            } else {
+              content.style.fontSize = "1.3rem";
+              content.textContent = item.content;
+            }
+            div.appendChild(content);
+
+            if (item.isQuestion) {
+              var badge = document.createElement("div");
+              badge.className = "q-badge";
+              badge.textContent = "?";
+              div.appendChild(badge);
+            }
+
+            if (item.blocked) div.classList.add("is-blocked");
+            if (item.matched) div.classList.add("is-matched");
+
+            div.addEventListener("click", function () {
+              onItemClick(index);
+            });
+            div.addEventListener(
+              "touchstart",
+              function (e) {
+                e.stopPropagation();
+                onItemClick(index);
+              },
+              { passive: true },
+            );
+
+            playArea.appendChild(div);
+          });
+        }
+
+        function renderCrayons() {
+          crayonBar.innerHTML = "";
+          crayonColors.forEach(function (color, index) {
+            var btn = document.createElement("button");
+            btn.className = "crayon";
+            btn.style.background = color;
+            btn.dataset.index = index;
+            if (index === currentCrayon) btn.classList.add("active");
+            if (usedCrayons.includes(index)) btn.classList.add("used");
+            btn.addEventListener("click", function () {
+              selectCrayon(index);
+            });
+            crayonBar.appendChild(btn);
+          });
+        }
+
+        function selectCrayon(index) {
+          if (usedCrayons.includes(index)) return;
+          currentCrayon = index;
+          renderCrayons();
+        }
+
+        function onItemClick(index) {
+          var item = gameData[index];
+          if (item.matched || item.blocked) return;
+
+          if (drawingMode === "line") {
+            if (item.isQuestion) {
+              if (selectedQuestion) {
+                var prev = document.querySelector(
+                  '.game-item[data-index="' +
+                    gameData.indexOf(selectedQuestion) +
+                    '"]',
+                );
+                if (prev) prev.classList.remove("is-selected");
+              }
+              selectedQuestion = item;
+              selectedAnswer = null;
+              var el = document.querySelector(
+                '.game-item[data-index="' + index + '"]',
+              );
+              if (el) el.classList.add("is-selected");
+              showFeedback("good", "Selected! Now pick an answer.");
+            } else {
+              if (!selectedQuestion) {
+                showFeedback("hint", "First pick a question (with ? badge)!");
+                return;
+              }
+              selectedAnswer = item;
+              checkMatch();
+            }
+          } else {
+            // Simple or Strict mode - color matching
+            if (item.isQuestion) {
+              if (selectedQuestion) {
+                var prev = document.querySelector(
+                  '.game-item[data-index="' +
+                    gameData.indexOf(selectedQuestion) +
+                    '"]',
+                );
+                if (prev) prev.classList.remove("is-selected");
+              }
+              selectedQuestion = item;
+              selectedAnswer = null;
+              var el = document.querySelector(
+                '.game-item[data-index="' + index + '"]',
+              );
+              if (el) el.classList.add("is-selected");
+              showFeedback(
+                "good",
+                "Question selected! Now pick the matching answer.",
+              );
+            } else {
+              if (!selectedQuestion) {
+                showFeedback("hint", "First pick a question (with ? badge)!");
+                return;
+              }
+              selectedAnswer = item;
+              checkMatch();
+            }
+          }
+        }
+
+        function checkMatch() {
+          var qPair = selectedQuestion.pairId;
+          var aPair = selectedAnswer.pairId;
+
+          if (qPair === aPair) {
+            // Correct match!
+            selectedQuestion.matched = true;
+            selectedAnswer.matched = true;
+            pairColors[qPair] = currentCrayon;
+
+            if (drawingMode !== "line") {
+              usedCrayons.push(currentCrayon);
+              currentCrayon = (currentCrayon + 1) % crayonColors.length;
+              while (usedCrayons.includes(currentCrayon)) {
+                currentCrayon = (currentCrayon + 1) % crayonColors.length;
+              }
+            }
+
+            showFeedback("good", "✨ Perfect match!");
+            stageScore += 10;
+            score += 10;
+
+            // Animation
+            setTimeout(function () {
+              renderItems();
+              renderCrayons();
+              checkStageComplete();
+            }, 300);
+          } else {
+            // Wrong match
+            showFeedback("bad", "❌ Not a match! Try again.");
+
+            var qEl = document.querySelector(
+              '.game-item[data-index="' +
+                gameData.indexOf(selectedQuestion) +
+                '"]',
+            );
+            var aEl = document.querySelector(
+              '.game-item[data-index="' +
+                gameData.indexOf(selectedAnswer) +
+                '"]',
+            );
+            if (qEl) qEl.classList.add("shake", "wrong-flash");
+            if (aEl) aEl.classList.add("shake", "wrong-flash");
+
+            if (drawingMode === "strict" || gameMode === "score") {
+              selectedAnswer.blocked = true;
+            }
+
+            setTimeout(function () {
+              if (qEl) qEl.classList.remove("shake", "wrong-flash");
+              if (aEl) aEl.classList.remove("shake", "wrong-flash");
+              renderItems();
+              checkStageComplete();
+            }, 500);
+
+            if (gameMode === "score") {
+              score = Math.max(0, score - 5);
+            }
+          }
+
+          selectedQuestion = null;
+          selectedAnswer = null;
+        }
+
+        function checkStageComplete() {
+          var allMatched = gameData.every(function (item) {
+            return item.matched;
+          });
+          if (allMatched) {
+            showFeedback(
+              "good",
+              "🎉 Stage complete! +" + stageScore + " points",
+            );
+            setTimeout(nextStage, 1500);
+          }
+        }
+
+        function showFeedback(type, message) {
+          feedback.className = "feedback " + type;
+          feedback.textContent = message;
+        }
+
+        // --- DRAWING (Line mode) ---
+        function getCanvasPos(e) {
+          var rect = playArea.getBoundingClientRect();
+          var clientX = e.clientX || (e.touches && e.touches[0].clientX);
+          var clientY = e.clientY || (e.touches && e.touches[0].clientY);
+          return {
+            x: clientX - rect.left,
+            y: clientY - rect.top,
+          };
+        }
+
+        function startDrawing(e) {
+          if (drawingMode !== "line") return;
+          var pos = getCanvasPos(e);
+          var item = getItemAt(pos.x, pos.y);
+          if (item && item.isQuestion && !item.matched && !item.blocked) {
+            isDrawing = true;
+            selectedQuestion = item;
+            currentLine = {
+              startX: pos.x,
+              startY: pos.y,
+              endX: pos.x,
+              endY: pos.y,
+            };
+            var el = document.querySelector(
+              '.game-item[data-index="' + gameData.indexOf(item) + '"]',
+            );
+            if (el) el.classList.add("is-selected");
+            e.preventDefault();
+          }
+        }
+
+        function draw(e) {
+          if (!isDrawing || drawingMode !== "line") return;
+          var pos = getCanvasPos(e);
+          currentLine.endX = pos.x;
+          currentLine.endY = pos.y;
+          redrawCanvas();
+        }
+
+        function stopDrawing(e) {
+          if (!isDrawing || drawingMode !== "line") return;
+          var pos = getCanvasPos(e);
+          var item = getItemAt(pos.x, pos.y);
+          if (item && !item.isQuestion && !item.matched && !item.blocked) {
+            selectedAnswer = item;
+            checkMatch();
+          } else if (selectedQuestion) {
+            var el = document.querySelector(
+              '.game-item[data-index="' +
+                gameData.indexOf(selectedQuestion) +
+                '"]',
+            );
+            if (el) el.classList.remove("is-selected");
+            selectedQuestion = null;
+            showFeedback("hint", "Draw from a question to its answer!");
+          }
+          isDrawing = false;
+          currentLine = null;
+          redrawCanvas();
+        }
+
+        function handleTouchStart(e) {
+          e.preventDefault();
+          if (e.touches.length === 1) {
+            startDrawing(e.touches[0]);
+          }
+        }
+
+        function handleTouchMove(e) {
+          e.preventDefault();
+          if (e.touches.length === 1) {
+            draw(e.touches[0]);
+          }
+        }
+
+        function handleTouchEnd(e) {
+          if (e.changedTouches.length === 1) {
+            stopDrawing(e.changedTouches[0]);
+          }
+        }
+
+        function getItemAt(x, y) {
+          for (var i = 0; i < gameData.length; i++) {
+            var item = gameData[i];
+            if (item.matched || item.blocked) continue;
+            if (
+              x >= item.x &&
+              x <= item.x + item.width &&
+              y >= item.y &&
+              y <= item.y + item.height
+            ) {
+              return item;
+            }
+          }
+          return null;
+        }
+
+        function redrawCanvas() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw completed lines
+          lines.forEach(function (line) {
+            ctx.beginPath();
+            ctx.moveTo(line.startX, line.startY);
+            ctx.lineTo(line.endX, line.endY);
+            ctx.strokeStyle =
+              crayonColors[line.colorIndex % crayonColors.length];
+            ctx.lineWidth = 6;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.stroke();
+          });
+
+          // Draw current line being drawn
+          if (currentLine) {
+            ctx.beginPath();
+            ctx.moveTo(currentLine.startX, currentLine.startY);
+            ctx.lineTo(currentLine.endX, currentLine.endY);
+            ctx.strokeStyle = crayonColors[currentCrayon % crayonColors.length];
+            ctx.lineWidth = 6;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.setLineDash([10, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+
+        function showEndScreen() {
+          gameScreen.classList.add("hidden");
+          endScreen.classList.remove("hidden");
+          scoreDisplay.textContent =
+            score +
+            " / " +
+            totalStages *
+              10 *
+              (difficulty === 1 ? 3 : difficulty === 2 ? 4 : 5);
         }
 
         function returnToMenu() {
@@ -926,712 +1587,12 @@
           menuScreen.classList.remove("hidden");
         }
 
-        // --- STAGE BUILDING ---
-        function buildPairs() {
-          var N = difficultyPairs();
-          var type =
-            selectedType === 4
-              ? 1 + Math.floor(Math.random() * 3)
-              : selectedType;
-          var pool = shuffleArray(dictionary.slice());
-          var chosen = pool.slice(0, N);
-
-          var pairs = chosen.map(function (e) {
-            var qd, ad;
-            if (type === 1) {
-              qd = e.text.toUpperCase();
-              ad = e.emoji;
-            } else if (type === 2) {
-              qd = e.emoji;
-              ad = e.text.toUpperCase();
-            } else {
-              qd = e.emoji;
-              ad = e.emoji;
-            }
-            return {
-              entry: e,
-              qDisplay: qd,
-              aDisplay: ad,
-              matched: false,
-              color: null,
-              q: null,
-              a: null,
-              qBlocked: false,
-              aBlocked: false,
-            };
-          });
-          return { type: type, pairs: pairs };
-        }
-
-        function isTextDisplay(d) {
-          return d.length > 1 && /[A-Z]/.test(d);
-        }
-
-        function scatterRect(W, H, size, placed) {
-          var pad = 12;
-          for (var t = 0; t < 220; t++) {
-            var x = pad + Math.random() * (W - pad * 2 - size.w);
-            var y = pad + Math.random() * (H - pad * 2 - size.h);
-            var ok = true;
-            for (var i = 0; i < placed.length; i++) {
-              var r = placed[i];
-              if (
-                x < r.x + r.w + 8 &&
-                x + size.w + 8 > r.x &&
-                y < r.y + r.h + 8 &&
-                y + size.h + 8 > r.y
-              ) {
-                ok = false;
-                break;
-              }
-            }
-            if (ok) return { x: x, y: y, w: size.w, h: size.h };
-          }
-          return { x: pad, y: pad, w: size.w, h: size.h };
-        }
-
-        function newStage() {
-          stageAdvancing = false;
-          stageState = buildPairs();
-          renderStage();
-        }
-
-        function renderStage() {
-          playArea
-            .querySelectorAll(".game-item")
-            .forEach(function (n) {
-              n.remove();
-            });
-          strokes = [];
-          currentLine = null;
-          selectedQ = null;
-          strokeActive = null;
-          tapTarget = null;
-          lineDrag = false;
-
-          var pairs = stageState.pairs;
-          var N = pairs.length;
-          var W = playArea.clientWidth;
-          var S = Math.min(1, Math.max(0.75, W / 640));
-          var emW = Math.round(92 * S);
-          var txW = Math.round(136 * S);
-          var itH = Math.round(80 * S);
-          var gap = Math.round(16 * S);
-          var pad = Math.max(12, Math.round(18 * S));
-          var H = Math.max(320, Math.round(N * (itH + gap) + pad * 2 - gap));
-          playArea.style.height = H + "px";
-          var W2 = playArea.clientWidth;
-
-          function itemSize(display) {
-            return isTextDisplay(display)
-              ? { w: txW, h: itH }
-              : { w: emW, h: itH };
-          }
-
-          var qPos = [];
-          var aPos = [];
-
-          if (randomPlacement) {
-            var placed = [];
-            pairs.forEach(function (p) {
-              var qs = itemSize(p.qDisplay);
-              var as = itemSize(p.aDisplay);
-              var qr = scatterRect(W2, H, qs, placed);
-              placed.push(qr);
-              qPos.push(qr);
-              var ar = scatterRect(W2, H, as, placed);
-              placed.push(ar);
-              aPos.push(ar);
-            });
-          } else {
-            pairs.forEach(function (p, i) {
-              var ys = pad + i * (itH + gap);
-              var qs = itemSize(p.qDisplay);
-              var as = itemSize(p.aDisplay);
-              qPos.push({ x: pad, y: ys, w: qs.w, h: qs.h });
-              aPos.push({ x: W2 - pad - as.w, y: ys, w: as.w, h: as.h });
-            });
-          }
-
-          items = [];
-          pairs.forEach(function (p, i) {
-            p.q = createItem(i, true, p.qDisplay, qPos[i], S);
-            p.a = createItem(i, false, p.aDisplay, aPos[i], S);
-          });
-
-          // Restore progress from pair state (used on window resize rebuilds)
-          pairs.forEach(function (p) {
-            if (p.matched) {
-              p.q.matched = true;
-              p.a.matched = true;
-              p.q.el.classList.add("is-matched");
-              p.a.el.classList.add("is-matched");
-              if (p.color && p.color !== "green") {
-                var cray = CRAYONS.find(function (c) {
-                  return c.name === p.color;
-                });
-                if (cray) {
-                  p.q.el.style.background = cray.fill;
-                  p.a.el.style.background = cray.fill;
-                }
-              }
-            }
-            if (p.qBlocked) {
-              p.q.blocked = true;
-              p.q.el.classList.add("is-blocked");
-            }
-            if (p.aBlocked) {
-              p.a.blocked = true;
-              p.a.el.classList.add("is-blocked");
-            }
-          });
-
-          resizeCanvas();
-          renderCrayons();
-          redraw();
-          progressDiv.innerText =
-            "Stage " + (stageIndex + 1) + " of " + TOTAL_STAGES;
-        }
-
-        function createItem(pairId, isQ, display, rect, S) {
-          var el = document.createElement("div");
-          el.className = "game-item " + (isQ ? "q-item" : "a-item");
-          var text = isTextDisplay(display);
-          var content = text ? esc(display) : display;
-          el.innerHTML =
-            '<span class="item-content">' +
-            content +
-            "</span>" +
-            (isQ ? '<span class="q-badge">❓</span>' : "");
-          el.style.left = rect.x + "px";
-          el.style.top = rect.y + "px";
-          el.style.width = rect.w + "px";
-          el.style.height = rect.h + "px";
-          el.style.fontSize = text
-            ? Math.round(17 * S) + "px"
-            : Math.round(44 * S) + "px";
-          playArea.appendChild(el);
-
-          var item = {
-            pairId: pairId,
-            isQ: isQ,
-            display: display,
-            x: rect.x,
-            y: rect.y,
-            w: rect.w,
-            h: rect.h,
-            el: el,
-            matched: false,
-            blocked: false,
-            color: null,
-            lastMarked: 0,
-          };
-          items.push(item);
-          return item;
-        }
-
-        // --- CANVAS ---
-        function resizeCanvas() {
-          var w = playArea.clientWidth;
-          var h = playArea.clientHeight;
-          var dpr = window.devicePixelRatio || 1;
-          canvas.width = Math.round(w * dpr);
-          canvas.height = Math.round(h * dpr);
-          canvas.style.width = w + "px";
-          canvas.style.height = h + "px";
-        }
-
-        function drawSegment(a, b, color, width, alpha) {
-          ctx.globalAlpha = alpha;
-          ctx.strokeStyle = color;
-          ctx.fillStyle = color;
-          ctx.lineWidth = width;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(a.x, a.y, width / 2 + 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(b.x, b.y, width / 2 + 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-
-        function drawPath(pts, color, width, alpha) {
-          if (pts.length < 2) return;
-          ctx.globalAlpha = alpha;
-          ctx.strokeStyle = color;
-          ctx.lineWidth = width;
-          ctx.beginPath();
-          ctx.moveTo(pts[0].x, pts[0].y);
-          for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
-
-        function redraw() {
-          if (!stageState) return;
-          var w = playArea.clientWidth;
-          var h = playArea.clientHeight;
-          var dpr = window.devicePixelRatio || 1;
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          ctx.clearRect(0, 0, w, h);
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-
-          // Center guide for fixed layout
-          if (!randomPlacement && currentDrawMode === "line") {
-            ctx.strokeStyle = "rgba(120,144,156,0.25)";
-            ctx.lineWidth = 2;
-            ctx.setLineDash([6, 8]);
-            ctx.beginPath();
-            ctx.moveTo(w / 2, 12);
-            ctx.lineTo(w / 2, h - 12);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          }
-
-          // Confirmed matched connections
-          stageState.pairs.forEach(function (p) {
-            if (!p.matched) return;
-            var color =
-              p.color === "green"
-                ? "#4caf50"
-                : (CRAYONS.find(function (c) {
-                    return c.name === p.color;
-                  }) || { stroke: "#4caf50" }).stroke;
-            drawSegment(centerItem(p.q), centerItem(p.a), color, 10, 0.85);
-          });
-
-          // Simple-mode free strokes
-          strokes.forEach(function (s) {
-            var cray = CRAYONS.find(function (c) {
-              return c.name === s.color;
-            });
-            drawPath(s.pts, (cray || { stroke: "#888" }).stroke, 10, 0.7);
-          });
-
-          // Active drag line (line mode)
-          if (currentLine) {
-            var qItem = items.find(function (it) {
-              return it.isQ && it.pairId === currentLine.pairId && !it.matched;
-            });
-            if (qItem) {
-              drawSegment(
-                centerItem(qItem),
-                { x: currentLine.x, y: currentLine.y },
-                "#ff9800",
-                9,
-                0.75,
-              );
-            }
-          }
-
-          // Selected question glow ring
-          if (selectedQ) {
-            var c = centerItem(selectedQ);
-            ctx.strokeStyle = "rgba(33,150,243,0.8)";
-            ctx.lineWidth = 3;
-            ctx.setLineDash([7, 7]);
-            ctx.beginPath();
-            ctx.arc(c.x, c.y, selectedQ.w / 2 + 8, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          }
-        }
-
-        // --- CRAYON UI (Simple mode) ---
-        function renderCrayons() {
-          if (crayonUsed[activeCrayon]) {
-            var idx = CRAYONS.findIndex(function (_, i) {
-              return !crayonUsed[i];
-            });
-            if (idx >= 0) activeCrayon = idx;
-          }
-          crayonBar.innerHTML = "";
-          CRAYONS.forEach(function (c, i) {
-            var b = document.createElement("button");
-            b.className =
-              "crayon" +
-              (i === activeCrayon ? " active" : "") +
-              (crayonUsed[i] ? " used" : "");
-            b.style.background = c.stroke;
-            b.title = c.name;
-            b.disabled = crayonUsed[i];
-            b.onclick = function () {
-              if (crayonUsed[i]) return;
-              activeCrayon = i;
-              renderCrayons();
-            };
-            crayonBar.appendChild(b);
-          });
-        }
-
-        // --- SIMPLE MODE: marking ---
-        function markPoint(px, py, stroke) {
-          var cray = CRAYONS.find(function (c) {
-            return c.name === stroke.color;
-          });
-          if (!cray) return;
-          items.forEach(function (it) {
-            if (it.matched || it.blocked) return;
-            if (inRect({ x: px, y: py }, it, 12)) {
-              it.color = stroke.color;
-              it.lastMarked = ++markSeq;
-              it.el.style.background = cray.fill;
-            }
-          });
-        }
-
-        function evaluateSimpleStroke(strokeColor) {
-          var cray = CRAYONS.find(function (c) {
-            return c.name === strokeColor;
-          }) || CRAYONS[activeCrayon];
-          var colored = items.filter(function (it) {
-            return !it.matched && !it.blocked && it.color === cray.name;
-          });
-
-          if (colored.length > 2) {
-            colored.sort(function (x, y) {
-              return x.lastMarked - y.lastMarked;
-            });
-            var keep = colored.slice(-2);
-            colored.slice(0, -2).forEach(function (it) {
-              it.color = null;
-              it.el.style.background = "";
-            });
-            colored = keep;
-          }
-
-          if (colored.length !== 2) return;
-
-          var a = colored[0];
-          var b = colored[1];
-
-          if (a.pairId === b.pairId) {
-            var pair = stageState.pairs[a.pairId];
-            pair.matched = true;
-            pair.color = cray.name;
-            a.matched = true;
-            b.matched = true;
-            a.el.classList.add("is-matched");
-            b.el.classList.add("is-matched");
-            crayonUsed[
-              CRAYONS.findIndex(function (c) {
-                return c.name === cray.name;
-              })
-            ] = true;
-            if (currentMode === "score") score++;
-            showFeedback(
-              currentMode === "score" ? "Correct! ⭐ +1" : "Yay! Good Job! 🌟",
-              "good",
-            );
-            renderCrayons();
-            checkProgress();
-          } else {
-            if (currentMode === "normal") {
-              showFeedback(
-                "Oops! Those don't match. Try again! 🤗",
-                "bad",
-              );
-              flashItems([a, b]);
-              a.color = null;
-              b.color = null;
-              a.el.style.background = "";
-              b.el.style.background = "";
-            } else {
-              var pa = stageState.pairs[a.pairId];
-              var pb = stageState.pairs[b.pairId];
-              pa.qBlocked = true;
-              pa.aBlocked = true;
-              pb.qBlocked = true;
-              pb.aBlocked = true;
-              [pa, pb].forEach(function (pr) {
-                pr.q.blocked = true;
-                pr.a.blocked = true;
-                pr.q.el.classList.add("is-blocked");
-                pr.a.el.classList.add("is-blocked");
-              });
-              showFeedback("Wrong! ❌ Both pairs are locked now.", "bad");
-              checkProgress();
-            }
-          }
-          redraw();
-        }
-
-        // --- LINE MODE: matching ---
-        function attemptLineMatch(q, a) {
-          if (!q || !a) return;
-
-          if (q.pairId === a.pairId) {
-            var pair = stageState.pairs[q.pairId];
-            pair.matched = true;
-            pair.color = "green";
-            q.matched = true;
-            a.matched = true;
-            q.el.classList.add("is-matched");
-            a.el.classList.add("is-matched");
-            if (currentMode === "score") score++;
-            showFeedback(
-              currentMode === "score" ? "Correct! ⭐ +1" : "Yay! Good Job! 🌟",
-              "good",
-            );
-            checkProgress();
-          } else {
-            if (currentMode === "normal") {
-              showFeedback(
-                "Oops! Not a match. Try again! 🤗",
-                "bad",
-              );
-              flashItems([q, a]);
-            } else {
-              // Score / Strict: one attempt per answer — lock it
-              var apair = stageState.pairs[a.pairId];
-              apair.aBlocked = true;
-              a.blocked = true;
-              a.el.classList.add("is-blocked");
-              showFeedback(
-                "Wrong! ❌ That answer is locked now.",
-                "bad",
-              );
-              flashItems([q]);
-              checkProgress();
-            }
-          }
-          redraw();
-        }
-
-        function checkProgress() {
-          if (stageAdvancing) return;
-          var pairs = stageState.pairs;
-          var resolved = pairs.filter(function (p) {
-            return p.matched || p.qBlocked || p.aBlocked;
-          }).length;
-          if (resolved >= pairs.length) {
-            stageAdvancing = true;
-            setTimeout(nextStage, 1200);
-          }
-        }
-
-        function nextStage() {
-          stageIndex++;
-          if (stageIndex < TOTAL_STAGES) {
-            newStage();
-          } else {
-            showEndScreen();
-          }
-        }
-
-        function showEndScreen() {
-          gameScreen.classList.add("hidden");
-          endScreen.classList.remove("hidden");
-          if (currentMode === "score") {
-            scoreDisplay.innerText = score + " / " + maxScore;
-          } else {
-            scoreDisplay.innerHTML = "⭐⭐⭐<br>You are a star!";
-          }
-        }
-
-        // --- POINTER EVENTS ---
-        playArea.addEventListener("pointerdown", function (e) {
-          if (stageAdvancing || drawing) return;
-          e.preventDefault();
-          var p = toLocal(e);
-          drawing = true;
-          tapStart = { x: p.x, y: p.y };
-          currentLine = null;
-          tapTarget = null;
-
-          if (currentDrawMode !== "simple") {
-            // LINE MODE
-            var q = items.find(function (it) {
-              return (
-                it.isQ &&
-                !it.matched &&
-                !it.blocked &&
-                inRect(p, it, 8)
-              );
-            });
-
-            if (q) {
-              selectedQ = q;
-              lineDrag = true;
-              currentLine = { pairId: q.pairId, x: p.x, y: p.y };
-              q.el.classList.add("is-selected");
-              hintLine.innerText = "Now draw or tap its match! 👇";
-              showFeedback("", "");
-              redraw();
-              return;
-            }
-
-            var a = items.find(function (it) {
-              return (
-                !it.isQ &&
-                !it.matched &&
-                !it.blocked &&
-                inRect(p, it, 8)
-              );
-            });
-
-            if (a) {
-              if (selectedQ) {
-                tapTarget = a; // tap-to-confirm
-              } else {
-                showFeedback(
-                  "👆 First pick a question (dashed border)!",
-                  "hint",
-                );
-                flashItems(
-                  items.filter(function (it) {
-                    return it.isQ && !it.matched && !it.blocked;
-                  }).slice(0, 3),
-                );
-              }
-              return;
-            }
-
-            // Empty space / locked items: keep selection, do nothing
-            var locked = items.find(function (it) {
-              return (
-                it.blocked &&
-                inRect(p, it, 8)
-              );
-            });
-            if (locked) {
-              showFeedback("🔒 That one is locked!", "hint");
-            }
-          } else {
-            // SIMPLE MODE: start a free stroke (a tap = a dot)
-            var cray = CRAYONS[activeCrayon];
-            strokeActive = {
-              color: cray.name,
-              pts: [{ x: p.x, y: p.y }],
-            };
-            strokes.push(strokeActive);
-            markPoint(p.x, p.y, strokeActive);
-            redraw();
-          }
-        });
-
-        window.addEventListener("pointermove", function (e) {
-          if (!drawing) return;
-          var p = toLocal(e);
-
-          if (currentDrawMode !== "simple") {
-            if (lineDrag && currentLine) {
-              currentLine.x = p.x;
-              currentLine.y = p.y;
-              redraw();
-              return;
-            }
-            if (tapTarget && tapStart && dist(p, tapStart) > 12) {
-              tapTarget = null; // it became a drag, not a tap
-            }
-          } else if (strokeActive) {
-            var last = strokeActive.pts[strokeActive.pts.length - 1];
-            if (dist(p, last) > 3) {
-              strokeActive.pts.push({ x: p.x, y: p.y });
-              markPoint(p.x, p.y, strokeActive);
-              redraw();
-            }
-          }
-        });
-
-        window.addEventListener("pointerup", function (e) {
-          if (!drawing) return;
-          drawing = false;
-          var p = toLocal(e);
-
-          if (currentDrawMode !== "simple") {
-            if (tapTarget) {
-              // Quick tap on an answer after selecting a question
-              attemptLineMatch(selectedQ, tapTarget);
-              tapTarget = null;
-              lineDrag = false;
-              currentLine = null;
-              clearSelection();
-              redraw();
-              return;
-            }
-
-            if (lineDrag && currentLine) {
-              var target = items.find(function (it) {
-                return (
-                  !it.matched &&
-                  !it.blocked &&
-                  inRect(p, it, 8)
-                );
-              });
-
-              if (target) {
-                if (target.isQ) {
-                  // Released on a question: switch selection
-                  clearSelection();
-                  selectedQ = target;
-                  target.el.classList.add("is-selected");
-                  hintLine.innerText = "Now draw or tap its match! 👇";
-                  showFeedback("", "");
-                } else {
-                  attemptLineMatch(selectedQ, target);
-                  clearSelection();
-                }
-              } else {
-                // Released on empty space: line clears, question stays selected
-                showFeedback("Just tap its match! 👇", "hint");
-              }
-              currentLine = null;
-              redraw();
-            }
-            lineDrag = false;
-            tapTarget = null;
-          } else if (strokeActive) {
-            var strokeColor = strokeActive.color;
-            strokeActive = null;
-            if (p) evaluateSimpleStroke(strokeColor);
-          }
-          tapStart = null;
-        });
-
-        window.addEventListener("pointercancel", function () {
-          drawing = false;
-          strokeActive = null;
-          currentLine = null;
-          lineDrag = false;
-          tapTarget = null;
-          redraw();
-        });
-
-        function clearSelection() {
-          if (selectedQ) {
-            selectedQ.el.classList.remove("is-selected");
-            selectedQ = null;
-          }
-          hintLine.innerText = drawModeHint();
-        }
-
-        // --- MISC ---
-        window.addEventListener("contextmenu", function (e) {
-          if (playArea.contains(e.target)) e.preventDefault();
-        });
-
-        var rzTimer = null;
-        window.addEventListener("resize", function () {
-          if (gameScreen.classList.contains("hidden") || !stageState) return;
-          clearTimeout(rzTimer);
-          rzTimer = setTimeout(function () {
-            resizeCanvas();
-            renderStage();
-          }, 200);
-        });
-
-        // init
-        setDrawUI();
-
-        // Expose to inline onclick handlers (HTML buttons)
+        // Expose globally
         window.startGame = startGame;
         window.returnToMenu = returnToMenu;
+
+        // Start
+        init();
       })();
     </script>
   </body>
